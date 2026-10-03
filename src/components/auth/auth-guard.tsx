@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 
 import { useGetMe } from "@/hooks";
 import { useRouter } from "next/navigation";
@@ -31,3 +31,4 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
+ */

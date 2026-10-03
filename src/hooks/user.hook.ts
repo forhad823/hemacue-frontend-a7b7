@@ -1,11 +1,11 @@
-import { getMe } from "@/api";
+// import { getMe } from "@/api";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+// import { useMutation, useQuery } from "@tanstack/react-query";
 
-export function useGetMe() {
-  return useQuery({
-    queryKey: ["user"],
-    queryFn: getMe,
-    retry: false,
-  });
-}
+// export function useGetMe() {
+//   return useQuery({
+//     queryKey: ["user"],
+//     queryFn: getMe,
+//     retry: false,
+//   });
+// }

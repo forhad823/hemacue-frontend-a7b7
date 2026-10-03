@@ -1,4 +1,4 @@
-import apiClient from "@/lib/apiClient";
+/* import apiClient from "@/lib/apiClient";
 import {
   LoginPayload,
   RegistrationPayload,
@@ -26,3 +26,4 @@ export function googleOAuth(payload: { idToken: string }) {
 }
 
 // inspire from the above code and implement rest of them.
+ */
