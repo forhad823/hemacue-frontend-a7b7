@@ -1,4 +1,4 @@
-/* "use client";
+"use client";
 
 import { useGetMe } from "@/hooks";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
     if (isError || !user) {
       router.replace("/login");
     }
-  }, [isPending, isError, user]);
+  }, [isPending, isError, user, router.replace]);
 
   if (isPending) {
     return <AuthLoading />;
@@ -31,4 +31,3 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
- */
