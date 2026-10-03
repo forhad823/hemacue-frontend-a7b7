@@ -1,12 +1,11 @@
 import {
-  getMe,
   googleOAuth,
   userLogin,
   userLogout,
   userRegistration,
   verifyAccount,
 } from "@/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export function useLogin() {
   return useMutation({
@@ -38,10 +37,3 @@ export function useGoogleOAuth() {
   });
 }
 
-export function useGetMe() {
-  return useQuery({
-    queryKey: ["user"],
-    queryFn: getMe,
-    retry: false,
-  });
-}
