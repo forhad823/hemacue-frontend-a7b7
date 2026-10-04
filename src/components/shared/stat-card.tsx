@@ -18,7 +18,12 @@ export function StatCard({
   className?: string;
 }) {
   return (
-    <Card className={cn("overflow-hidden transition-all hover:shadow-md", className)}>
+    <Card
+      className={cn(
+        "overflow-hidden transition-all hover:shadow-md",
+        className,
+      )}
+    >
       <CardContent className="flex items-center gap-4 p-5">
         {Icon && (
           <div
@@ -31,13 +36,13 @@ export function StatCard({
           </div>
         )}
         <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground">{label}</p>
+          <p className="text-sm font-extrabold text-muted-foreground">
+            {label}
+          </p>
           <p className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
             {value}
           </p>
-          {trend && (
-            <p className="text-xs text-muted-foreground">{trend}</p>
-          )}
+          {trend && <p className="text-xs text-muted-foreground">{trend}</p>}
         </div>
       </CardContent>
     </Card>

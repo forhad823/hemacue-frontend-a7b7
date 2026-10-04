@@ -30,7 +30,7 @@ export default function Hero() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/4 -z-10 size-[28rem] rounded-full bg-primary/10 blur-3xl"
+        className="pointer-events-none absolute -top-40 left-1/4 -z-10 size-112 rounded-full bg-primary/10 blur-3xl"
       />
       <div
         aria-hidden

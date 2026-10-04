@@ -64,8 +64,8 @@
   --accent: oklch(0.93 0.05 25);
   --accent-foreground: oklch(0.35 0.15 25);
   --destructive: oklch(0.62 0.24 27);
-  --border: oklch(0.90 0.01 250);
-  --input: oklch(0.90 0.01 250);
+  --border: oklch(0.9 0.01 250);
+  --input: oklch(0.9 0.01 250);
   --ring: oklch(0.55 0.22 25);
   --chart-1: oklch(0.55 0.22 25);
   --chart-2: oklch(0.62 0.24 27);
@@ -79,8 +79,9 @@
   --sidebar-primary-foreground: oklch(0.98 0.01 25);
   --sidebar-accent: oklch(0.93 0.05 25);
   --sidebar-accent-foreground: oklch(0.35 0.15 25);
-  --sidebar-border: oklch(0.90 0.01 250);
+  --sidebar-border: oklch(0.9 0.01 250);
   --sidebar-ring: oklch(0.55 0.22 25);
+  color-scheme: light;
 }
 
 .dark {
@@ -90,7 +91,7 @@
   --card-foreground: oklch(0.98 0.002 250);
   --popover: oklch(0.22 0.01 250);
   --popover-foreground: oklch(0.98 0.002 250);
-  --primary: oklch(0.60 0.22 25);
+  --primary: oklch(0.6 0.22 25);
   --primary-foreground: oklch(0.98 0.01 25);
   --secondary: oklch(0.25 0.01 250);
   --secondary-foreground: oklch(0.96 0.01 250);
@@ -99,22 +100,23 @@
   --accent: oklch(0.3 0.05 25);
   --accent-foreground: oklch(0.95 0.05 25);
   --destructive: oklch(0.65 0.24 27);
-  --border: oklch(0.30 0.01 250);
-  --input: oklch(0.30 0.01 250);
-  --ring: oklch(0.60 0.22 25);
-  --chart-1: oklch(0.60 0.22 25);
+  --border: oklch(0.3 0.01 250);
+  --input: oklch(0.3 0.01 250);
+  --ring: oklch(0.6 0.22 25);
+  --chart-1: oklch(0.6 0.22 25);
   --chart-2: oklch(0.65 0.24 27);
   --chart-3: oklch(0.7 0.02 250);
   --chart-4: oklch(0.3 0.05 25);
   --chart-5: oklch(0.96 0.01 250);
   --sidebar: oklch(0.22 0.01 250);
   --sidebar-foreground: oklch(0.98 0.002 250);
-  --sidebar-primary: oklch(0.60 0.22 25);
+  --sidebar-primary: oklch(0.6 0.22 25);
   --sidebar-primary-foreground: oklch(0.98 0.01 25);
   --sidebar-accent: oklch(0.3 0.05 25);
   --sidebar-accent-foreground: oklch(0.95 0.05 25);
-  --sidebar-border: oklch(0.30 0.01 250);
-  --sidebar-ring: oklch(0.60 0.22 25);
+  --sidebar-border: oklch(0.3 0.01 250);
+  --sidebar-ring: oklch(0.6 0.22 25);
+  color-scheme: dark;
 }
 
 @layer base {
@@ -124,7 +126,8 @@
   body {
     @apply bg-background text-foreground;
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
   html {

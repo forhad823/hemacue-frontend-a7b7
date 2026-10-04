@@ -31,16 +31,18 @@ export const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("Invalid email format"),
   password: passwordField(),
-  role: z.enum(["DONOR", "PATIENT"]).default("DONOR"),
-  bloodGroup: z.enum(Object.values(BloodGroup) as [string, ...string[]]),
+  role: z.enum(["DONOR", "PATIENT"]), // removed .default("DONOR")
+  bloodGroup: z.enum(BloodGroup), // z.nativeEnum is deprecated in Zod 4
   phone: z
     .string()
-    .refine((val) => val === "" || /^(?:\+?880|0)1[3-9]\d{8}$/.test(val), {
-      message: "Please provide valid Bangladeshi number",
-    }),
+    .min(1, "Phone number is required") // backend requires it
+    .regex(
+      /^(?:\+?880|0)1[3-9]\d{8}$/,
+      "Please provide valid Bangladeshi number",
+    ),
   district: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
-  address: z.string().optional(),
+  address: z.string(), // was .optional(); the form always has ""
 });
 
 export const verifyEmailSchema = z.object({
