@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import RegisterForm from "@/components/modules/auth/register-form";
 import { Suspense } from "react";
+import RegisterForm from "@/components/modules/auth/register-form";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Register Account",
@@ -12,7 +13,7 @@ export default function RegisterPage() {
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">
-        <Suspense fallback={null}>
+        <Suspense fallback={<Skeleton className="h-96 w-full" />}>
           <RegisterForm />
         </Suspense>
       </div>

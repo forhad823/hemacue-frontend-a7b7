@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,9 @@ export function SearchInput({
   }, [debouncedValue, onChange, externalValue]);
 
   return (
-    <div className={cn("relative flex items-center w-full max-w-sm", className)}>
+    <div
+      className={cn("relative flex items-center w-full max-w-sm", className)}
+    >
       <Search className="absolute left-3 size-4 text-muted-foreground pointer-events-none" />
       <Input
         value={internalValue}

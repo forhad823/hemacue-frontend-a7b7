@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -7,15 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
 
 export interface Column<T> {
   /** Stable unique key. Required if two columns share a header or have none. */
   id?: string;
-  header: string;
+  /** Plain text, or a node (e.g. a sortable button) when the header is interactive. */
+  header: ReactNode;
   accessorKey?: keyof T;
   cell?: (item: T) => ReactNode;
   className?: string;
@@ -32,7 +33,10 @@ interface DataTableShellProps<T> {
 }
 
 function getColumnKey<T>(col: Column<T>): string {
-  return col.id ?? (col.accessorKey ? String(col.accessorKey) : col.header);
+  if (col.id) return col.id;
+  if (col.accessorKey) return String(col.accessorKey);
+  // header may be a ReactNode (sortable tables), so only use it when it is text
+  return typeof col.header === "string" ? col.header : "column";
 }
 
 export function DataTableShell<T>({

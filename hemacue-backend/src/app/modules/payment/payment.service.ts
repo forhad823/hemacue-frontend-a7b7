@@ -12,6 +12,7 @@ import { prisma } from "../../lib/prisma";
 import type {
 	IExecutePaymentPayload,
 	IInitiatePaymentPayload,
+	IMyPaymentsQueryParams,
 	IRefundPaymentPayload,
 } from "./payment.interface";
 
@@ -42,6 +43,14 @@ const assertPaymentOwner = (
 		);
 	}
 };
+
+/**
+ * Bkash redirects the browser to this URL after checkout. The frontend page
+ * reads the paymentID and calls POST /payments/execute to settle it, so the
+ * callback must point at the frontend origin, not at this API.
+ */
+const bkashCallbackUrl = () =>
+	config.bkash_callback_url || `${config.frontend_url}/payment/callback`;
 
 const initiatePayment = async (
 	userId: string,
@@ -79,7 +88,7 @@ const initiatePayment = async (
 			body: JSON.stringify({
 				mode: "0011",
 				payerReference: payer.email ?? payer.phone ?? userId,
-				callbackURL: `${config.bkash_callback_url}/payments/execute`,
+				callbackURL: bkashCallbackUrl(),
 				amount: amount.toFixed(2),
 				currency: "BDT",
 				intent: "sale",
@@ -421,9 +430,54 @@ const getPaymentDetails = async (
 	});
 };
 
+/**
+ * Every payment created by the current user, newest first. Powers the patient
+ * payment-history screen without needing to aggregate per request.
+ */
+const getMyPayments = async (userId: string, query: IMyPaymentsQueryParams) => {
+	const { page = 1, limit = 10, sortOrder = "desc" } = query;
+	const skip = (page - 1) * limit;
+
+	const where = { userId };
+
+	const total = await prisma.payment.count({ where });
+
+	const payments = await prisma.payment.findMany({
+		where,
+		skip,
+		take: limit,
+		orderBy: { createdAt: sortOrder },
+		include: {
+			request: {
+				select: {
+					id: true,
+					patientName: true,
+					bloodGroup: true,
+					hospitalName: true,
+					district: true,
+					city: true,
+					status: true,
+				},
+			},
+		},
+	});
+
+	return {
+		meta: {
+			page,
+			limit,
+			total,
+			totalPages: Math.ceil(total / limit),
+			totalPage: Math.ceil(total / limit),
+		},
+		data: payments,
+	};
+};
+
 export const PaymentService = {
 	initiatePayment,
 	executePayment,
 	refundEmergencyLogisticsPayment,
 	getPaymentDetails,
+	getMyPayments,
 };

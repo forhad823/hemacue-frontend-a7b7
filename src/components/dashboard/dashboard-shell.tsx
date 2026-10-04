@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { AppSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
   return (

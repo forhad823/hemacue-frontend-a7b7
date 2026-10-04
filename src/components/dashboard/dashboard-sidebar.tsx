@@ -1,8 +1,11 @@
 "use client";
 
+import { Droplet, HeartPulse, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Droplet, LogOut, HeartPulse} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -15,12 +18,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useGetMe, useLogout } from "@/hooks";
-import { routesByRole } from "@/routes";
 import { clearRoleCookie } from "@/lib/session-client";
+import { routesByRole } from "@/routes";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -97,7 +97,10 @@ export function AppSidebar() {
           <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/40">
             <div className="flex items-center gap-2.5 min-w-0">
               <Avatar className="size-8 border border-border">
-                <AvatarImage src={user.avatarUrl || undefined} alt={user.name} />
+                <AvatarImage
+                  src={user.avatarUrl || undefined}
+                  alt={user.name}
+                />
                 <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                   {user.name?.slice(0, 2).toUpperCase()}
                 </AvatarFallback>

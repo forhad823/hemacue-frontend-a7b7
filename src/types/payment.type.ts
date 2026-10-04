@@ -1,4 +1,9 @@
-import type { PaymentStatus, PaymentType } from "./enums.type";
+import type {
+  BloodGroup,
+  PaymentStatus,
+  PaymentType,
+  RequestStatus,
+} from "./enums.type";
 
 export interface Payment {
   id: string;
@@ -40,3 +45,24 @@ export interface ExecutePaymentPayload {
 export interface RefundPaymentPayload {
   reason: string;
 }
+
+export interface MyPaymentsQueryParams {
+  page?: number;
+  limit?: number;
+  sortOrder?: "asc" | "desc";
+}
+
+/** Request summary embedded in `GET /payments/mine` rows. */
+export interface PaymentRequestSummary {
+  id: string;
+  patientName: string;
+  bloodGroup: BloodGroup;
+  hospitalName: string;
+  district: string;
+  city: string;
+  status: RequestStatus;
+}
+
+export type PaymentWithRequest = Payment & {
+  request: PaymentRequestSummary;
+};

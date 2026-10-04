@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ArrowRight, HeartPulse, Siren } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,9 @@ export function CtaSection({
   className,
 }: CtaSectionProps) {
   return (
-    <section className={cn("container mx-auto px-4 py-14 sm:px-6 lg:px-8", className)}>
+    <section
+      className={cn("container mx-auto px-4 py-14 sm:px-6 lg:px-8", className)}
+    >
       <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-red-600 via-red-600 to-rose-700 px-6 py-12 text-center shadow-lg shadow-red-600/20 sm:px-12">
         <div
           aria-hidden

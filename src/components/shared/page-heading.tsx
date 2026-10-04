@@ -29,7 +29,9 @@ export function PageHeading({
           <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {children && <div className="flex items-center gap-2 shrink-0">{children}</div>}
+      {children && (
+        <div className="flex items-center gap-2 shrink-0">{children}</div>
+      )}
     </div>
   );
 }

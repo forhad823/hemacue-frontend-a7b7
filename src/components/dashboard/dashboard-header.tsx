@@ -1,8 +1,8 @@
 "use client";
 
+import { Home, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/dashboard/theme-toggle";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetMe, useLogout } from "@/hooks";
 import { clearRoleCookie } from "@/lib/session-client";
-import { LogOut, User, Home } from "lucide-react";
 
 export function DashboardHeader() {
   const { data } = useGetMe();
@@ -38,7 +38,12 @@ export function DashboardHeader() {
       <div className="flex items-center gap-2">
         <SidebarTrigger className="cursor-pointer" />
         <Separator orientation="vertical" className="h-4" />
-        <Button variant="ghost" size="sm" render={<Link href="/" />} className="gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link href="/" />}
+          className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
           <Home className="size-3.5" />
           <span className="hidden sm:inline">Home</span>
         </Button>
@@ -49,23 +54,38 @@ export function DashboardHeader() {
 
         {user && (
           <DropdownMenu>
-            <DropdownMenuTrigger render={
-              <Button variant="ghost" className="relative size-8 rounded-full cursor-pointer p-0">
-                <Avatar className="size-8 border border-border">
-                  <AvatarImage src={user.avatarUrl || undefined} alt={user.name} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                    {user.name?.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            } />
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  className="relative size-8 rounded-full cursor-pointer p-0"
+                >
+                  <Avatar className="size-8 border border-border">
+                    <AvatarImage
+                      src={user.avatarUrl || undefined}
+                      alt={user.name}
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                      {user.name?.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              }
+            />
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-semibold leading-none">{user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground truncate">{user.email}</p>
+                  <p className="text-sm font-semibold leading-none">
+                    {user.name}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground truncate">
+                    {user.email}
+                  </p>
                   <div className="pt-1">
-                    <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] uppercase font-bold tracking-wider"
+                    >
                       {user.role}
                     </Badge>
                   </div>

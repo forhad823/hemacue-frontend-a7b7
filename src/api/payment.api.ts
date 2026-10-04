@@ -4,7 +4,9 @@ import type {
   ExecutePaymentPayload,
   InitiatePaymentPayload,
   InitiatePaymentResponse,
+  MyPaymentsQueryParams,
   Payment,
+  PaymentWithRequest,
   RefundPaymentPayload,
 } from "@/types";
 
@@ -25,6 +27,12 @@ export const paymentApi = {
     apiClient<ApiResponse<Payment>>(`/payments/refund/${requestId}`, {
       method: "POST",
       body: p,
+    }),
+
+  mine: (p: MyPaymentsQueryParams = {}) =>
+    apiClient<ApiResponse<PaymentWithRequest[]>>("/payments/mine", {
+      method: "GET",
+      query: p,
     }),
 
   byId: (id: string) =>

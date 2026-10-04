@@ -3,6 +3,7 @@ import type {
   AuditLogsQueryParams,
   BloodRequestQueryParams,
   CompatibleDonorQueryParams,
+  MyPaymentsQueryParams,
 } from "@/types";
 
 export const queryKeys = {
@@ -23,6 +24,7 @@ export const queryKeys = {
   },
   payments: {
     byId: (id: string) => ["payments", id] as const,
+    mine: (p?: MyPaymentsQueryParams) => ["payments", "mine", p] as const,
   },
   admin: {
     users: (p?: AdminUsersQueryParams) => ["admin", "users", p] as const,
@@ -31,4 +33,3 @@ export const queryKeys = {
       ["admin", "audit-logs", p] as const,
   },
 };
-

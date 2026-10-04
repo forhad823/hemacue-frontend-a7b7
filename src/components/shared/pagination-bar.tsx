@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -8,7 +9,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface PaginationBarProps {
@@ -42,7 +42,9 @@ export function PaginationBar({
   }
 
   return (
-    <div className={cn("flex items-center justify-between gap-4 py-3", className)}>
+    <div
+      className={cn("flex items-center justify-between gap-4 py-3", className)}
+    >
       <p className="text-xs text-muted-foreground hidden sm:block">
         Page <span className="font-medium text-foreground">{page}</span> of{" "}
         <span className="font-medium text-foreground">{totalPages}</span>
@@ -58,7 +60,10 @@ export function PaginationBar({
               onClick={() => onPageChange(page - 1)}
               className="gap-1 cursor-pointer disabled:cursor-not-allowed"
             >
-              <PaginationPrevious text="Prev" onClick={(e) => e.preventDefault()} />
+              <PaginationPrevious
+                text="Prev"
+                onClick={(e) => e.preventDefault()}
+              />
             </Button>
           </PaginationItem>
 

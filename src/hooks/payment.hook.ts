@@ -1,12 +1,13 @@
 "use client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { paymentApi } from "@/api";
 import { queryKeys } from "@/lib/query-keys";
 import type {
   ExecutePaymentPayload,
   InitiatePaymentPayload,
+  MyPaymentsQueryParams,
   RefundPaymentPayload,
 } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useInitiatePayment() {
   return useMutation({
@@ -41,5 +42,12 @@ export function usePayment(id: string) {
     queryKey: queryKeys.payments.byId(id),
     queryFn: () => paymentApi.byId(id),
     enabled: !!id,
+  });
+}
+
+export function useMyPayments(params: MyPaymentsQueryParams = {}) {
+  return useQuery({
+    queryKey: queryKeys.payments.mine(params),
+    queryFn: () => paymentApi.mine(params),
   });
 }

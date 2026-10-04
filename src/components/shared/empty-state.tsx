@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { FolderOpen } from "lucide-react";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
@@ -29,7 +29,9 @@ export function EmptyState({
         <Icon className="size-7" />
       </div>
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground max-w-sm">{description}</p>
+      <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+        {description}
+      </p>
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

@@ -12,6 +12,7 @@ export default function MobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
