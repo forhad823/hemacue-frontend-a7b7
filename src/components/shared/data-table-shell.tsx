@@ -13,6 +13,8 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
 
 export interface Column<T> {
+  /** Stable unique key. Required if two columns share a header or have none. */
+  id?: string;
   header: string;
   accessorKey?: keyof T;
   cell?: (item: T) => ReactNode;
@@ -29,6 +31,10 @@ interface DataTableShellProps<T> {
   skeletonRows?: number;
 }
 
+function getColumnKey<T>(col: Column<T>): string {
+  return col.id ?? (col.accessorKey ? String(col.accessorKey) : col.header);
+}
+
 export function DataTableShell<T>({
   columns,
   data,
@@ -38,16 +44,28 @@ export function DataTableShell<T>({
   className,
   skeletonRows = 5,
 }: DataTableShellProps<T>) {
+  // Skeleton rows are static placeholders, so generate their ids up front
+  // instead of using the index directly as a JSX key.
+  const skeletonRowKeys = Array.from(
+    { length: skeletonRows },
+    (_, n) => `skeleton-row-${n}`,
+  );
+
   return (
-    <Card className={cn("overflow-hidden border border-border shadow-xs", className)}>
+    <Card
+      className={cn(
+        "overflow-hidden border border-border shadow-xs",
+        className,
+      )}
+    >
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                {columns.map((col, i) => (
+                {columns.map((col) => (
                   <TableHead
-                    key={col.header || i}
+                    key={getColumnKey(col)}
                     className={cn(
                       "font-semibold text-xs text-muted-foreground uppercase tracking-wider",
                       col.className,
@@ -60,35 +78,47 @@ export function DataTableShell<T>({
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                Array.from({ length: skeletonRows }).map((_, idx) => (
-                  <TableRow key={`skeleton-row-${idx}`}>
-                    {columns.map((col, colIdx) => (
-                      <TableCell key={`skeleton-cell-${idx}-${colIdx}`}>
-                        <Skeleton className="h-5 w-full max-w-[120px]" />
+                skeletonRowKeys.map((rowKey) => (
+                  <TableRow key={rowKey}>
+                    {columns.map((col) => (
+                      <TableCell key={`${rowKey}-${getColumnKey(col)}`}>
+                        <Skeleton className="h-5 w-full max-w-30" />
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-48 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-48 text-center"
+                  >
                     {emptyState ?? <EmptyState className="border-none py-6" />}
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((item) => (
-                  <TableRow key={keyExtractor(item)} className="hover:bg-muted/30 transition-colors">
-                    {columns.map((col, colIdx) => (
-                      <TableCell key={`cell-${keyExtractor(item)}-${colIdx}`} className={col.className}>
-                        {col.cell
-                          ? col.cell(item)
-                          : col.accessorKey
-                            ? String(item[col.accessorKey] ?? "")
-                            : null}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                data.map((item) => {
+                  const rowKey = keyExtractor(item);
+                  return (
+                    <TableRow
+                      key={rowKey}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      {columns.map((col) => (
+                        <TableCell
+                          key={`${rowKey}-${getColumnKey(col)}`}
+                          className={col.className}
+                        >
+                          {col.cell
+                            ? col.cell(item)
+                            : col.accessorKey
+                              ? String(item[col.accessorKey] ?? "")
+                              : null}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

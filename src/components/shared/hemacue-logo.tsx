@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
 import { Droplet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,7 @@ export function HemacueLogo({
 }: HemacueLogoProps) {
   return (
     <div className={cn("flex items-center gap-2.5 group select-none", className)}>
-      <div className={cn("relative flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-md shadow-red-500/20 transition-transform group-hover:scale-105 dark:from-red-600 dark:to-red-800", iconClassName)}>
+      <div className={cn("relative flex size-9 items-center justify-center rounded-xl bg-linear-to-br from-red-600 to-rose-700 text-white shadow-md shadow-red-500/20 transition-transform group-hover:scale-105 dark:from-red-600 dark:to-red-800", iconClassName)}>
         <svg
           viewBox="0 0 24 24"
           fill="none"

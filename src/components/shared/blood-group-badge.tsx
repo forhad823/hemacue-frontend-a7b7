@@ -1,4 +1,5 @@
 import { Droplet } from "lucide-react";
+import { formatBloodGroup } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { BloodGroup } from "@/types";
 
@@ -9,11 +10,6 @@ export function BloodGroupBadge({
   group: BloodGroup;
   className?: string;
 }) {
-  const label = group
-    .replace("_POSITIVE", "+")
-    .replace("_NEGATIVE", "−")
-    .replace("_", "");
-
   return (
     <span
       className={cn(
@@ -22,7 +18,7 @@ export function BloodGroupBadge({
       )}
     >
       <Droplet className="size-3 fill-red-500 text-red-500 dark:fill-red-400 dark:text-red-400" />
-      <span>{label}</span>
+      <span>{formatBloodGroup(group)}</span>
     </span>
   );
 }

@@ -7,3 +7,4 @@ export * from "./donor-match.type";
 export * from "./payment.type";
 export * from "./admin.type";
 export * from "./sidebar.type";
+export * from "./public.type";
