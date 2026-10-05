@@ -51,7 +51,7 @@ export function PaymentResult({
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
       <Card className="w-full max-w-lg">
-        <CardHeader className="items-center text-center">
+        <CardHeader className="items-center justify-items-center text-center">
           <div
             className={cn(
               "mb-2 flex size-14 items-center justify-center rounded-full",

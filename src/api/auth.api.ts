@@ -71,3 +71,4 @@ export const googleOAuth = authApi.googleLogin;
 export const forgotPassword = authApi.forgotPassword;
 export const resetPassword = authApi.resetPassword;
 export const resendOtp = authApi.resendRegisterOtp;
+export const refreshAuthToken = authApi.refreshToken;

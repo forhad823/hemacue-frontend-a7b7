@@ -13,6 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -98,61 +99,64 @@ export default function HeaderAuthActions({
           </span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col gap-1">
-              <p className="truncate text-sm font-semibold leading-none">
-                {user.name}
-              </p>
-              <p className="truncate text-xs leading-none text-muted-foreground">
-                {user.email}
-              </p>
-              <Badge
-                variant="outline"
-                className="mt-1 w-fit px-1.5 py-0 text-[10px] font-bold tracking-wider uppercase"
-              >
-                {humanizeToken(user.role)}
-              </Badge>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            render={
-              <Link
-                href={`/${user.role.toLowerCase()}`}
-                className="cursor-pointer gap-2"
-              />
-            }
-          >
-            <LayoutDashboard className="size-4" />
-            Dashboard
-          </DropdownMenuItem>
-          {user.role !== UserRole.ADMIN && (
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col gap-1">
+                <p className="truncate text-sm font-semibold leading-none">
+                  {user.name}
+                </p>
+                <p className="truncate text-xs leading-none text-muted-foreground">
+                  {user.email}
+                </p>
+                <Badge
+                  variant="outline"
+                  className="mt-1 w-fit px-1.5 py-0 text-[10px] font-bold tracking-wider uppercase"
+                >
+                  {humanizeToken(user.role)}
+                </Badge>
+              </div>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               render={
                 <Link
-                  href={`/${user.role.toLowerCase()}/profile`}
+                  href={`/${user.role.toLowerCase()}`}
                   className="cursor-pointer gap-2"
                 />
               }
             >
-              <User className="size-4" />
-              Profile
+              <LayoutDashboard className="size-4" />
+              Dashboard
             </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            variant="destructive"
-            className="cursor-pointer gap-2"
-          >
-            {isLoggingOut ? (
-              <Spinner className="size-4" />
-            ) : (
-              <LogOut className="size-4" />
+            {user.role !== UserRole.ADMIN && (
+              <DropdownMenuItem
+                render={
+                  <Link
+                    href={`/${user.role.toLowerCase()}/profile`}
+                    className="cursor-pointer gap-2"
+                  />
+                }
+              >
+                <User className="size-4" />
+                Profile
+              </DropdownMenuItem>
             )}
-            {isLoggingOut ? "Signing out..." : "Log out"}
-          </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              variant="destructive"
+              className="cursor-pointer gap-2"
+            >
+              {isLoggingOut ? (
+                <Spinner className="size-4" />
+              ) : (
+                <LogOut className="size-4" />
+              )}
+              {isLoggingOut ? "Signing out..." : "Log out"}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     );

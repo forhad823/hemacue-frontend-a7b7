@@ -146,14 +146,14 @@ export default function MyRequestsTable() {
             options={REQUEST_STATUS_OPTIONS}
             onChange={(status) => setValues({ status, page: "1" })}
           />
-          <Button
+          {/* <Button
             size="sm"
             className="gap-1.5"
             render={<Link href="/patient/new" />}
           >
             <FilePlus2 className="size-4" />
             New request
-          </Button>
+          </Button> */}
         </div>
       </div>
 

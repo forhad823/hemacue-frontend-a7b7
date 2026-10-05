@@ -121,6 +121,17 @@ export const ALLOWED_STATUS_TRANSITIONS: Record<
   CANCELLED: [],
 };
 
+/** Only admins may verify a request; every other transition follows the shared map. */
+export function getAvailableTransitions(
+  status: RequestStatus,
+  role?: string,
+): RequestStatus[] {
+  const transitions = ALLOWED_STATUS_TRANSITIONS[status];
+  return role === "ADMIN"
+    ? transitions
+    : transitions.filter((next) => next !== "VERIFIED");
+}
+
 /** Human label for an enum-ish token: DONOR_ASSIGNED -> "Donor assigned". */
 export function humanizeToken(token: string): string {
   const spaced = token.replaceAll("_", " ").toLowerCase();

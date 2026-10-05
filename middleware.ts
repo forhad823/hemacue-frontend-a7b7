@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const ROLE_COOKIE = "user-role";
+// const AUTH_PAGES = ["/login", "/register"];
 
 const rolePathMap: Record<string, string> = {
   "/admin": "ADMIN",
@@ -31,5 +32,11 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/patient/:path*", "/donor/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/patient/:path*",
+    "/donor/:path*",
+    // "/login",
+    // "/register",
+  ],
 };

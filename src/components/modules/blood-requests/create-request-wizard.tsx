@@ -137,7 +137,7 @@ export default function CreateRequestWizard() {
         district: value.district,
         city: value.city.trim(),
         urgency: value.urgency,
-        neededBy: value.neededBy,
+        neededBy: new Date(`${value.neededBy}T23:59:59`).toISOString(),
         notes: value.notes.trim() || undefined,
       };
 

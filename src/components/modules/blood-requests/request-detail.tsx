@@ -54,11 +54,12 @@ import {
 } from "@/hooks";
 import { PAYMENT_PRICING } from "@/lib/constants";
 import {
-  ALLOWED_STATUS_TRANSITIONS,
+  // ALLOWED_STATUS_TRANSITIONS,
   formatBloodGroup,
   formatCurrency,
   formatDate,
   formatDateTime,
+  getAvailableTransitions,
   humanizeToken,
 } from "@/lib/format";
 import type { BloodGroup, RequestStatus } from "@/types";
@@ -99,7 +100,8 @@ export default function RequestDetail({ requestId }: RequestDetailProps) {
   const canManage = isOwner || isAdmin;
   const canAssignDonor =
     canManage && request.status === RequestStatusEnum.VERIFIED;
-  const transitions = ALLOWED_STATUS_TRANSITIONS[request.status];
+
+  const transitions = getAvailableTransitions(request.status, me?.data.role);
 
   const changeStatus = (status: RequestStatus) => {
     updateStatus.mutate(status, {

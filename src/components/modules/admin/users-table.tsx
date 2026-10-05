@@ -39,6 +39,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
@@ -283,42 +284,45 @@ export default function AdminUsersTable({
               render={
                 <Button
                   variant="ghost"
-                  size="icon-sm"
-                  aria-label={`Manage ${user.name}`}
-                  className="cursor-pointer"
-                />
+                  size="sm"
+                  className="cursor-pointer bg-orange-600 font-bold text-white hover:text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  manage
+                </Button>
               }
             >
               <MoreHorizontal className="size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel className="flex items-center gap-1.5">
-                <UserCog className="size-3.5" />
-                Change role
-              </DropdownMenuLabel>
-              {Object.values(UserRoleEnum).map((role) => (
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="flex items-center gap-1.5">
+                  <UserCog className="size-3.5" />
+                  Change role
+                </DropdownMenuLabel>
+                {Object.values(UserRoleEnum).map((role) => (
+                  <DropdownMenuItem
+                    key={role}
+                    onClick={() => changeRole(user, role)}
+                    disabled={role === user.role}
+                    className="cursor-pointer justify-between"
+                  >
+                    {humanizeToken(role)}
+                    {role === user.role && (
+                      <ShieldCheck className="size-3.5 opacity-60" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  key={role}
-                  onClick={() => changeRole(user, role)}
-                  disabled={role === user.role}
-                  className="cursor-pointer justify-between"
+                  variant="destructive"
+                  onClick={() => setPendingBlock(user)}
+                  disabled={user.id === actingUserId}
+                  className="cursor-pointer"
                 >
-                  {humanizeToken(role)}
-                  {role === user.role && (
-                    <ShieldCheck className="size-3.5 opacity-60" />
-                  )}
+                  <Ban className="size-4" />
+                  {user.isDeleted ? "Unblock user" : "Block user"}
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setPendingBlock(user)}
-                disabled={user.id === actingUserId}
-                className="cursor-pointer"
-              >
-                <Ban className="size-4" />
-                {user.isDeleted ? "Unblock user" : "Block user"}
-              </DropdownMenuItem>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

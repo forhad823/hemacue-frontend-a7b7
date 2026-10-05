@@ -13,6 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -73,44 +74,46 @@ export function DashboardHeader() {
               }
             />
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-semibold leading-none">
-                    {user.name}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground truncate">
-                    {user.email}
-                  </p>
-                  <div className="pt-1">
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] uppercase font-bold tracking-wider"
-                    >
-                      {user.role}
-                    </Badge>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-semibold leading-none">
+                      {user.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground truncate">
+                      {user.email}
+                    </p>
+                    <div className="pt-1">
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] uppercase font-bold tracking-wider"
+                      >
+                        {user.role}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                render={
-                  <Link
-                    href={`/${user.role.toLowerCase()}/profile`}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <User className="size-4" />
-                    <span>Profile & Settings</span>
-                  </Link>
-                }
-              />
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-destructive focus:text-destructive cursor-pointer"
-              >
-                <LogOut className="mr-2 size-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  render={
+                    <Link
+                      href={`/${user.role.toLowerCase()}/profile`}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="size-4" />
+                      <span>Profile & Settings</span>
+                    </Link>
+                  }
+                />
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                >
+                  <LogOut className="mr-2 size-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
