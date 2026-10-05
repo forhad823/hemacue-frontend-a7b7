@@ -33,8 +33,8 @@
 - **Emergency & Standard Requests:** Create detailed blood requests specifying patient name, required blood group, hospital address, district, quantity, urgency, and deadline.
 - **Smart Compatible Donor Matching:** Search eligible donors based on medical ABO/Rh blood compatibility rules while strictly excluding donors under the 90-day cooldown period.
 - **Donor Assignment:** Directly assign compatible donors to blood requests and track response states (`PENDING`, `ACCEPTED`, `DECLINED`).
-- **Guarded State Machine Lifecycle:** Track request progression through guarded statuses:
-  $$\text{PENDING} \rightarrow \text{VERIFIED} \rightarrow \text{DONOR\_ASSIGNED} \rightarrow \text{IN\_PROGRESS} \rightarrow \text{COMPLETED}$$
+- **Guarded State Machine Lifecycle:** Track request progression through guarded statuses: <br/>
+  PENDING > VERIFIED > DONOR_ASSIGNED > IN_PROGRESS > COMPLETED
 - **bKash Logistics & Boosting:** Trigger bKash payments for premium SMS notification blasts and emergency courier logistics.
 
 ### 💖 Donor Portal
