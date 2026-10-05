@@ -11,11 +11,28 @@ import type {
   VerifyEmailPayload,
 } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { clearSession, persistSession } from "@/lib/session-client";
 
 export function useLogin() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (p: LoginPayload) => authApi.login(p),
+    mutationFn: async (p: LoginPayload) => {
+      const res = await authApi.login(p);
+      await persistSession(res.data);
+      return res;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
+  });
+}
+
+export function useGoogleOAuth() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (p: GoogleLoginPayload) => {
+      const res = await authApi.googleLogin(p);
+      await persistSession(res.data);
+      return res;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
   });
 }
@@ -23,14 +40,6 @@ export function useLogin() {
 export function useRegistration() {
   return useMutation({
     mutationFn: (p: RegisterPayload) => authApi.register(p),
-  });
-}
-
-export function useVerifyAccount() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (p: VerifyEmailPayload) => authApi.verifyEmail(p),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
   });
 }
 
@@ -52,10 +61,18 @@ export function useResetPassword() {
   });
 }
 
-export function useGoogleOAuth() {
+
+export function useVerifyAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (p: GoogleLoginPayload) => authApi.googleLogin(p),
+    mutationFn: async (p: VerifyEmailPayload) => {
+      const res = await authApi.verifyEmail(p);
+      await persistSession({
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+      });
+      return res;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
   });
 }
@@ -63,7 +80,13 @@ export function useGoogleOAuth() {
 export function useLogout() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => authApi.logout(),
+    mutationFn: async () => {
+      try {
+        return await authApi.logout();
+      } finally {
+        await clearSession(); // clear the frontend copies even if the API call fails
+      }
+    },
     onSuccess: () => qc.clear(),
   });
 }

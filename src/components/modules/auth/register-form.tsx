@@ -380,7 +380,9 @@ export default function RegisterForm() {
         </FieldGroup>
       </form>
 
-      <FieldSeparator>Or continue with</FieldSeparator>
+      <FieldSeparator>
+        Or<span className="font-bold text-red-500"> If Donor</span>
+      </FieldSeparator>
 
       <div className="flex justify-center">
         <GoogleLoginComponent />

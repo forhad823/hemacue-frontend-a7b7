@@ -14,7 +14,13 @@ import { setRoleCookie } from "@/lib/session-client";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import GoogleLoginComponent from "../google-login/GoogleLogin";
 import DemoLoginPanel from "./demo-login-panel";
@@ -66,11 +72,12 @@ export default function LoginForm() {
           onError: (err) => {
             toast.add({
               title: "Login Failed",
-              description: err.message || "Invalid credentials. Please try again.",
+              description:
+                err.message || "Invalid credentials. Please try again.",
               type: "error",
             });
           },
-        }
+        },
       );
     },
   });
@@ -78,7 +85,9 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Login to your account</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Login to your account
+        </h1>
         <p className="text-sm text-muted-foreground">
           Enter your email and password to access your Hemacue dashboard
         </p>
@@ -98,7 +107,8 @@ export default function LoginForm() {
         <FieldGroup>
           <form.Field name="email">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
@@ -125,7 +135,8 @@ export default function LoginForm() {
 
           <form.Field name="password">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <div className="flex items-center justify-between">
@@ -156,7 +167,11 @@ export default function LoginForm() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword((prev) => !prev)}
                     >
-                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      {showPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
                     </button>
                   </div>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -177,7 +192,9 @@ export default function LoginForm() {
         </FieldGroup>
       </form>
 
-      <FieldSeparator>Or continue with</FieldSeparator>
+      <FieldSeparator>
+        Or<span className="font-bold text-red-500"> If Donor</span>
+      </FieldSeparator>
 
       <div className="flex justify-center">
         <GoogleLoginComponent />
