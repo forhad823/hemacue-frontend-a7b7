@@ -21,7 +21,7 @@ export function useLogin() {
       await persistSession(res.data);
       return res;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.users.me }),
   });
 }
 
@@ -33,7 +33,7 @@ export function useGoogleOAuth() {
       await persistSession(res.data);
       return res;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.users.me }),
   });
 }
 
@@ -61,7 +61,6 @@ export function useResetPassword() {
   });
 }
 
-
 export function useVerifyAccount() {
   const qc = useQueryClient();
   return useMutation({
@@ -73,7 +72,7 @@ export function useVerifyAccount() {
       });
       return res;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.auth.me }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.users.me }),
   });
 }
 

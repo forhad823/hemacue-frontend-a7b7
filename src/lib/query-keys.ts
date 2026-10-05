@@ -7,7 +7,7 @@ import type {
 } from "@/types";
 
 export const queryKeys = {
-  auth: { me: ["auth", "me"] as const },
+  auth: { me: ["auth", "me"] as const }, // Nothing else in the project reads queryKeys.auth.me, so i can remove this key from query-keys.ts once nothing references it.
   users: {
     me: ["users", "me"] as const,
     all: (p?: AdminUsersQueryParams) => ["users", "all", p] as const,
