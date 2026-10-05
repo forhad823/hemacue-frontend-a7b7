@@ -26,7 +26,7 @@ export const authApi = {
     apiClient<ApiResponse<null>>("/auth/verify-email/resend-otp", {
       method: "POST",
       body: p,
-    }),
+    }), 
 
   login: (p: LoginPayload) =>
     apiClient<ApiResponse<AuthTokens>>("/auth/login", {
