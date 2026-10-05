@@ -330,7 +330,8 @@ export default function RequestDetail({ requestId }: RequestDetailProps) {
                                 <Phone className="size-3" />
                                 {assignment.donor.phone}
                               </span>
-                            )}
+                            )}{" "}
+                            <br />
                             {assignment.donor?.city ??
                               assignment.donor?.district}
                           </p>

@@ -88,7 +88,7 @@ export default function AdminOverview() {
       >
         <Button
           variant="outline"
-          size="sm"
+          size="lg"
           className={
             "bg-red-700 text-white hover:text-white hover:bg-red-800 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           }
