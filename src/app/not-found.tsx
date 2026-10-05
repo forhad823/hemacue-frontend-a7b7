@@ -22,7 +22,10 @@ export default function NotFound() {
       description="The link may be out of date, or the page may have moved. Let's get you back to somewhere that can help."
       actions={
         <>
-          <Link href="/" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
+          <Link
+            href="/"
+            className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+          >
             <House className="size-4" />
             Back to home
           </Link>

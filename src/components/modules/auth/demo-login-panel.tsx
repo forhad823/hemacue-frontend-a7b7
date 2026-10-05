@@ -87,7 +87,7 @@ export default function DemoLoginPanel() {
             type: "error",
           });
         },
-      }
+      },
     );
   };
 

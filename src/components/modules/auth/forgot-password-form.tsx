@@ -9,7 +9,12 @@ import { useForgotPassword } from "@/hooks";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function ForgotPasswordForm() {
@@ -37,7 +42,8 @@ export default function ForgotPasswordForm() {
         onError: (err) => {
           toast.add({
             title: "Request Failed",
-            description: err.message || "Could not process request. Please try again.",
+            description:
+              err.message || "Could not process request. Please try again.",
             type: "error",
           });
         },
@@ -53,7 +59,8 @@ export default function ForgotPasswordForm() {
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Forgot password?</h1>
         <p className="text-sm text-muted-foreground">
-          Enter your account email address and we&apos;ll send you a password reset code.
+          Enter your account email address and we&apos;ll send you a password
+          reset code.
         </p>
       </div>
 
@@ -67,7 +74,8 @@ export default function ForgotPasswordForm() {
         <FieldGroup>
           <form.Field name="email">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>

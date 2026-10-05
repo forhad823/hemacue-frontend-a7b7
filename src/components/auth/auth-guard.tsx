@@ -2,7 +2,7 @@
 
 import { useGetMe } from "@/hooks";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import AuthLoading from "./auth-loading";
 
 export default function AuthGuard({ children }: { children: ReactNode }) {

@@ -10,8 +10,17 @@ import { useResetPassword, useForgotPassword, useCountdown } from "@/hooks";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function ResetPasswordForm() {
@@ -23,7 +32,8 @@ export default function ResetPasswordForm() {
   const { seconds, isLocked, start: startCooldown } = useCountdown(60);
 
   const { mutate: resetPassword, isPending: isResetting } = useResetPassword();
-  const { mutate: forgotPassword, isPending: isResending } = useForgotPassword();
+  const { mutate: forgotPassword, isPending: isResending } =
+    useForgotPassword();
 
   const form = useForm({
     defaultValues: {
@@ -47,7 +57,8 @@ export default function ResetPasswordForm() {
         onError: (err) => {
           toast.add({
             title: "Reset Failed",
-            description: err.message || "Invalid or expired OTP. Please try again.",
+            description:
+              err.message || "Invalid or expired OTP. Please try again.",
             type: "error",
           });
         },
@@ -78,11 +89,12 @@ export default function ResetPasswordForm() {
         onError: (err) => {
           toast.add({
             title: "Resend Failed",
-            description: err.message || "Failed to resend code. Please try again.",
+            description:
+              err.message || "Failed to resend code. Please try again.",
             type: "error",
           });
         },
-      }
+      },
     );
   };
 
@@ -92,10 +104,15 @@ export default function ResetPasswordForm() {
         <div className="flex size-12 items-center justify-center rounded-full bg-red-100 text-primary dark:bg-red-950/40">
           <KeyRound className="size-6" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Reset your password</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Reset your password
+        </h1>
         <p className="text-sm text-muted-foreground">
           Enter the OTP sent to{" "}
-          <span className="font-medium text-foreground">{emailParam || "your email"}</span> and choose a new password
+          <span className="font-medium text-foreground">
+            {emailParam || "your email"}
+          </span>{" "}
+          and choose a new password
         </p>
       </div>
 
@@ -131,9 +148,13 @@ export default function ResetPasswordForm() {
           {/* OTP Code */}
           <form.Field name="otp">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
-                <Field data-invalid={isInvalid} className="flex flex-col items-center">
+                <Field
+                  data-invalid={isInvalid}
+                  className="flex flex-col items-center"
+                >
                   <FieldLabel htmlFor={field.name} className="self-start">
                     6-Digit OTP Code
                   </FieldLabel>
@@ -160,7 +181,8 @@ export default function ResetPasswordForm() {
           {/* New Password */}
           <form.Field name="newPassword">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
@@ -182,7 +204,11 @@ export default function ResetPasswordForm() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword((prev) => !prev)}
                     >
-                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      {showPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
                     </button>
                   </div>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -204,7 +230,9 @@ export default function ResetPasswordForm() {
       </form>
 
       <div className="flex flex-col items-center gap-2 text-center">
-        <p className="text-xs text-muted-foreground">Didn&apos;t get the code?</p>
+        <p className="text-xs text-muted-foreground">
+          Didn&apos;t get the code?
+        </p>
         <Button
           type="button"
           variant="outline"
@@ -228,7 +256,10 @@ export default function ResetPasswordForm() {
       </div>
 
       <div className="text-center">
-        <Link href="/login" className="text-xs font-medium text-muted-foreground hover:text-foreground">
+        <Link
+          href="/login"
+          className="text-xs font-medium text-muted-foreground hover:text-foreground"
+        >
           Remember your password? Sign In
         </Link>
       </div>

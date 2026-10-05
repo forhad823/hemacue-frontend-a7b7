@@ -8,6 +8,6 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <PublicHeader />
       <main className="flex-1">{children}</main>
       <PublicFooter />
-    </div> 
-  ); 
+    </div>
+  );
 }

@@ -1,9 +1,4 @@
-import {
-  LayoutDashboard,
-  Users,
-  ScrollText,
-  Droplets,
-} from "lucide-react";
+import { LayoutDashboard, Users, ScrollText, Droplets } from "lucide-react";
 import type { SidebarGroup } from "@/types";
 
 export const adminRoutes: SidebarGroup[] = [

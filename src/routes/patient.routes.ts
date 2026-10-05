@@ -18,8 +18,6 @@ export const patientRoutes: SidebarGroup[] = [
   },
   {
     title: "Account",
-    items: [
-      { title: "Profile", url: "/patient/profile", icon: User },
-    ],
+    items: [{ title: "Profile", url: "/patient/profile", icon: User }],
   },
 ];

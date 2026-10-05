@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import QueryProvider from "./query.provider";
 import GoogleAuthProvider from "./google-auth.provider";
 import ThemeProvider from "./theme.provider";

@@ -10,7 +10,11 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Talk to the Hemacue support team about blood requests, donor onboarding, bKash payments or anything else. 24/7 emergency line, email and office address.",
-  keywords: ["contact Hemacue", "blood donation support", "emergency blood helpline"],
+  keywords: [
+    "contact Hemacue",
+    "blood donation support",
+    "emergency blood helpline",
+  ],
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact — Hemacue",
@@ -78,7 +82,9 @@ export default function ContactPage() {
                         {href ? (
                           <a
                             href={href}
-                            target={href.startsWith("http") ? "_blank" : undefined}
+                            target={
+                              href.startsWith("http") ? "_blank" : undefined
+                            }
                             rel={
                               href.startsWith("http") ? "noreferrer" : undefined
                             }
@@ -112,7 +118,13 @@ export default function ContactPage() {
               <Button
                 variant="outline"
                 className="w-full gap-2"
-                render={<a href={CONTACT_INFO.mapsUrl} target="_blank" rel="noreferrer" />}
+                render={
+                  <a
+                    href={CONTACT_INFO.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
               >
                 <Navigation className="size-4" />
                 Open in Google Maps

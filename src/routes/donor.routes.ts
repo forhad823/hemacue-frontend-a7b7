@@ -1,9 +1,4 @@
-import {
-  HeartPulse,
-  Droplets,
-  BarChart3,
-  User,
-} from "lucide-react";
+import { HeartPulse, Droplets, BarChart3, User } from "lucide-react";
 import type { SidebarGroup } from "@/types";
 
 export const donorRoutes: SidebarGroup[] = [
@@ -17,8 +12,6 @@ export const donorRoutes: SidebarGroup[] = [
   },
   {
     title: "Account",
-    items: [
-      { title: "Profile & Cooldown", url: "/donor/profile", icon: User },
-    ],
+    items: [{ title: "Profile & Cooldown", url: "/donor/profile", icon: User }],
   },
 ];

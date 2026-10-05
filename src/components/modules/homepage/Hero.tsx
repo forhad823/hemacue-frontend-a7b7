@@ -134,7 +134,8 @@ export default function Hero() {
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Post a request with hospital, district and urgency — our
-                  matching engine surfaces only the donors who can actually help.
+                  matching engine surfaces only the donors who can actually
+                  help.
                 </p>
                 <Button
                   variant="link"

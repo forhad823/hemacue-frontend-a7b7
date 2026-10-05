@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Check, Droplet, HeartHandshake, Truck } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowRight,
+  Check,
+  Droplet,
+  HeartHandshake,
+  Truck,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/shared/section-heading";
 
@@ -62,38 +63,42 @@ export default function Features() {
       />
 
       <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {features.map(({ icon: Icon, title, description, points, href, cta }) => (
-          <Card
-            key={title}
-            className="group h-full overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-red-500/5"
-          >
-            <CardHeader>
-              <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <Icon className="size-6" />
-              </span>
-              <CardTitle className="mt-4 text-lg font-semibold">{title}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col gap-5">
-              <p className="text-sm text-muted-foreground">{description}</p>
-              <ul className="flex flex-1 flex-col gap-2.5">
-                {points.map((point) => (
-                  <li key={point} className="flex items-start gap-2 text-sm">
-                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <span className="text-muted-foreground">{point}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant="outline"
-                className="w-full justify-between gap-2"
-                render={<Link href={href} />}
-              >
-                {cta}
-                <ArrowRight className="size-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        {features.map(
+          ({ icon: Icon, title, description, points, href, cta }) => (
+            <Card
+              key={title}
+              className="group h-full overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-red-500/5"
+            >
+              <CardHeader>
+                <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Icon className="size-6" />
+                </span>
+                <CardTitle className="mt-4 text-lg font-semibold">
+                  {title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-5">
+                <p className="text-sm text-muted-foreground">{description}</p>
+                <ul className="flex flex-1 flex-col gap-2.5">
+                  {points.map((point) => (
+                    <li key={point} className="flex items-start gap-2 text-sm">
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                      <span className="text-muted-foreground">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between gap-2"
+                  render={<Link href={href} />}
+                >
+                  {cta}
+                  <ArrowRight className="size-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          ),
+        )}
       </div>
     </section>
   );

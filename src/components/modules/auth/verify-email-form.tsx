@@ -10,8 +10,17 @@ import { queryKeys } from "@/lib/query-keys";
 import { setRoleCookie } from "@/lib/session-client";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { Mail, RefreshCw } from "lucide-react";
 
@@ -58,7 +67,8 @@ export default function VerifyEmailForm() {
         onError: (err) => {
           toast.add({
             title: "Verification Failed",
-            description: err.message || "Invalid or expired OTP. Please try again.",
+            description:
+              err.message || "Invalid or expired OTP. Please try again.",
             type: "error",
           });
         },
@@ -89,11 +99,13 @@ export default function VerifyEmailForm() {
         onError: (err) => {
           toast.add({
             title: "Resend Failed",
-            description: err.message || "Failed to resend OTP. Please wait before retrying.",
+            description:
+              err.message ||
+              "Failed to resend OTP. Please wait before retrying.",
             type: "error",
           });
         },
-      }
+      },
     );
   };
 
@@ -106,7 +118,9 @@ export default function VerifyEmailForm() {
         <h1 className="text-2xl font-bold tracking-tight">Verify your email</h1>
         <p className="text-sm text-muted-foreground">
           We sent a 6-digit verification code to{" "}
-          <span className="font-medium text-foreground">{emailParam || "your email"}</span>
+          <span className="font-medium text-foreground">
+            {emailParam || "your email"}
+          </span>
         </p>
       </div>
 
@@ -120,9 +134,13 @@ export default function VerifyEmailForm() {
         <FieldGroup>
           <form.Field name="otp">
             {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
-                <Field data-invalid={isInvalid} className="flex flex-col items-center">
+                <Field
+                  data-invalid={isInvalid}
+                  className="flex flex-col items-center"
+                >
                   <FieldLabel htmlFor={field.name} className="sr-only">
                     Verification Code
                   </FieldLabel>
@@ -159,7 +177,9 @@ export default function VerifyEmailForm() {
       </form>
 
       <div className="flex flex-col items-center gap-2 text-center">
-        <p className="text-xs text-muted-foreground">Didn&apos;t receive the code?</p>
+        <p className="text-xs text-muted-foreground">
+          Didn&apos;t receive the code?
+        </p>
         <Button
           type="button"
           variant="outline"
@@ -183,4 +203,4 @@ export default function VerifyEmailForm() {
       </div>
     </div>
   );
-} 
+}

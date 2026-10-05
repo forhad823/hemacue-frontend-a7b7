@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CircleCheck,
-  Eye,
-  Scale,
-  Target,
-  X,
-} from "lucide-react";
+import { ArrowRight, CircleCheck, Eye, Scale, Target, X } from "lucide-react";
 import { CtaSection } from "@/components/shared/cta-section";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +15,11 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Hemacue exists to close the gap between blood banks and people who need blood in an emergency. Learn the problem we solve, our mission and the technology behind the platform.",
-  keywords: ["about Hemacue", "blood donation platform", "healthcare Bangladesh"],
+  keywords: [
+    "about Hemacue",
+    "blood donation platform",
+    "healthcare Bangladesh",
+  ],
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About Hemacue",
@@ -67,14 +64,38 @@ const solutionPoints = [
 ];
 
 const stack = [
-  { label: "Next.js 16 App Router", detail: "Server Components, streaming and route-level caching" },
-  { label: "TypeScript", detail: "Strict types end to end, no `any` in the data layer" },
-  { label: "Tailwind CSS v4 + shadcn/ui", detail: "Design tokens for the blood, urgency and trust palette" },
-  { label: "TanStack Query", detail: "Server-state caching, mutations and cache invalidation" },
-  { label: "Express 5 + Prisma 7", detail: "REST API with a typed PostgreSQL data layer" },
-  { label: "JWT + Redis", detail: "Access and refresh tokens with rate-limited endpoints" },
-  { label: "bKash tokenized checkout", detail: "Sandbox payments, invoice generation and refunds" },
-  { label: "Cloudinary + Nodemailer", detail: "Avatar uploads, OTP and invoice emails" },
+  {
+    label: "Next.js 16 App Router",
+    detail: "Server Components, streaming and route-level caching",
+  },
+  {
+    label: "TypeScript",
+    detail: "Strict types end to end, no `any` in the data layer",
+  },
+  {
+    label: "Tailwind CSS v4 + shadcn/ui",
+    detail: "Design tokens for the blood, urgency and trust palette",
+  },
+  {
+    label: "TanStack Query",
+    detail: "Server-state caching, mutations and cache invalidation",
+  },
+  {
+    label: "Express 5 + Prisma 7",
+    detail: "REST API with a typed PostgreSQL data layer",
+  },
+  {
+    label: "JWT + Redis",
+    detail: "Access and refresh tokens with rate-limited endpoints",
+  },
+  {
+    label: "bKash tokenized checkout",
+    detail: "Sandbox payments, invoice generation and refunds",
+  },
+  {
+    label: "Cloudinary + Nodemailer",
+    detail: "Avatar uploads, OTP and invoice emails",
+  },
 ];
 
 export default function AboutPage() {

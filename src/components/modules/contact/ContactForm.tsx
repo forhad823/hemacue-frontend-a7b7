@@ -125,7 +125,9 @@ export default function ContactForm() {
                       autoComplete="name"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(event.target.value)}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
                       aria-invalid={isInvalid}
                     />
                     {isInvalid ? (
@@ -152,7 +154,9 @@ export default function ContactForm() {
                       autoComplete="email"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(event.target.value)}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
                       aria-invalid={isInvalid}
                     />
                     {isInvalid ? (
@@ -172,7 +176,9 @@ export default function ContactForm() {
 
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Phone (optional)</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Phone (optional)
+                    </FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -182,7 +188,9 @@ export default function ContactForm() {
                       autoComplete="tel"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(event.target.value)}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
                       aria-invalid={isInvalid}
                     />
                     {isInvalid ? (

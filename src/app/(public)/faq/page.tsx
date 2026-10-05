@@ -11,7 +11,11 @@ export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Answers about Hemacue donor matching, the 90-day donation cooldown, request verification, bKash payments and how your data is handled.",
-  keywords: ["blood donation FAQ", "donor cooldown", "bKash payment blood request"],
+  keywords: [
+    "blood donation FAQ",
+    "donor cooldown",
+    "bKash payment blood request",
+  ],
   alternates: { canonical: "/faq" },
   openGraph: {
     title: "Frequently Asked Questions — Hemacue",
@@ -119,7 +123,10 @@ export default function FaqPage() {
 
       <section className="container mx-auto flex max-w-4xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-8">
         <div>
-          <SectionHeading eyebrow="Getting started" title="Accounts and roles" />
+          <SectionHeading
+            eyebrow="Getting started"
+            title="Accounts and roles"
+          />
           <div className="mt-6">
             <FaqAccordion items={gettingStarted} />
           </div>
