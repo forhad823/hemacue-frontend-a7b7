@@ -1,8 +1,8 @@
 "use client";
 
-import { Droplets, Search } from "lucide-react";
+import { Droplets, Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -17,92 +17,137 @@ import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
 import { useBloodRequests, useGetMe } from "@/hooks";
 import { useSearchParamsState } from "@/hooks/use-search-params-state";
-import { canDonorServePatient } from "@/lib/blood-compatibility";
-import { URGENCY_OPTIONS } from "@/lib/constants";
-import { formatDate } from "@/lib/format";
-import type { BloodRequest } from "@/types";
+import { compatiblePatientGroups } from "@/lib/blood-compatibility";
+import {
+  BLOOD_GROUP_OPTIONS,
+  DISTRICTS,
+  REQUEST_STATUS_OPTIONS,
+  URGENCY_OPTIONS,
+} from "@/lib/constants";
+import { formatDateTime } from "@/lib/format";
+import type {
+  BloodGroup,
+  BloodRequest,
+  RequestStatus,
+  UrgencyLevel,
+} from "@/types";
 
-const FEED_SIZE = 50;
 const PAGE_SIZE = 8;
+
+/**
+ * The "needed from" cut-off is rounded down to 5 minutes. It has to be stable
+ * between renders: it is part of the query key, so a raw `Date.now()` would
+ * trigger a new request on every render.
+ */
+const NEEDED_FROM_STEP_MS = 5 * 60 * 1000;
 
 /** Requests that can still take a donor — mirrors the backend accept rules. */
 const ACCEPTABLE_STATUSES = ["VERIFIED", "DONOR_ASSIGNED", "IN_PROGRESS"];
 
+const DISTRICT_OPTIONS = DISTRICTS.map((district) => ({
+  value: district,
+  label: district,
+}));
+
 const DEFAULTS = {
   page: "1",
   searchTerm: "",
+  district: "",
+  bloodGroup: "",
   urgency: "",
   status: "",
 };
 
 /**
- * Open requests a donor can actually serve. The public feed is fetched once and
- * filtered locally with the donor-side compatibility map, because the API only
- * exposes "requests of group X" rather than "requests this donor can serve".
+ * Open requests a donor can serve.
+ *
+ * Default view: every request whose blood group this donor is compatible with
+ * (an O- donor sees all eight groups, an AB+ donor sees AB+ only), needed from
+ * now onward, soonest first, across every district.
+ *
+ * The Filters panel narrows that default down by district, a specific
+ * compatible blood group, urgency and status. Everything is filtered and
+ * paginated on the server, so a compatible request can never be pushed out of
+ * view by an arbitrary "first 50 rows" cut-off.
  */
 export default function OpenRequestsTable() {
   const { values, setValues } = useSearchParamsState(DEFAULTS);
   const { data: me } = useGetMe();
-  const [onlyMyDistrict, setOnlyMyDistrict] = useState(true);
 
   const donorGroup = me?.data.bloodGroup ?? null;
   const userDistrict = me?.data.district ?? "";
 
-  const { data, isPending } = useBloodRequests({ limit: FEED_SIZE });
-
-  const matches = useMemo(() => {
-    if (!donorGroup) return [];
-    const term = values.searchTerm.trim().toLowerCase();
-
-    return (data?.data ?? [])
-      .filter((request) => canDonorServePatient(donorGroup, request.bloodGroup))
-      .filter((request) =>
-        onlyMyDistrict && userDistrict
-          ? request.district === userDistrict
-          : true,
-      )
-      .filter((request) =>
-        values.urgency ? request.urgency === values.urgency : true,
-      )
-      .filter((request) =>
-        values.status ? request.status === values.status : true,
-      )
-      .filter((request) =>
-        term
-          ? [
-              request.hospitalName,
-              request.city,
-              request.district,
-              request.patientName,
-            ]
-              .join(" ")
-              .toLowerCase()
-              .includes(term)
-          : true,
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.neededBy).getTime() - new Date(b.neededBy).getTime(),
-      );
-  }, [
-    data,
-    donorGroup,
-    onlyMyDistrict,
-    userDistrict,
-    values.searchTerm,
-    values.status,
-    values.urgency,
-  ]);
-
-  const page = Number(values.page) || 1;
-  const totalPages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const visible = matches.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
+  const compatibleGroups = useMemo(
+    () => (donorGroup ? compatiblePatientGroups(donorGroup) : []),
+    [donorGroup],
+  );
+  const bloodGroupOptions = useMemo(
+    () =>
+      BLOOD_GROUP_OPTIONS.filter((option) =>
+        compatibleGroups.includes(option.value),
+      ),
+    [compatibleGroups],
   );
 
-  const goToPage = (next: number) => setValues({ page: String(next) });
+  // A hand-edited URL must not widen the compatible set.
+  const selectedGroup = compatibleGroups.includes(
+    values.bloodGroup as BloodGroup,
+  )
+    ? (values.bloodGroup as BloodGroup)
+    : "";
+
+  const activeFilterCount = [
+    values.district,
+    selectedGroup,
+    values.urgency,
+    values.status,
+  ].filter(Boolean).length;
+  const hasSearch = values.searchTerm.trim() !== "";
+
+  const [filtersOpen, setFiltersOpen] = useState(activeFilterCount > 0);
+
+  const page = Number(values.page) || 1;
+  const neededFrom = new Date(
+    Math.floor(Date.now() / NEEDED_FROM_STEP_MS) * NEEDED_FROM_STEP_MS,
+  ).toISOString();
+
+  const { data, isPending } = useBloodRequests(
+    {
+      page,
+      limit: PAGE_SIZE,
+      sortBy: "neededBy",
+      sortOrder: "asc",
+      neededFrom,
+      bloodGroups: compatibleGroups,
+      bloodGroup: selectedGroup || undefined,
+      district: values.district || undefined,
+      urgency: (values.urgency as UrgencyLevel) || undefined,
+      status: (values.status as RequestStatus) || undefined,
+      searchTerm: values.searchTerm.trim() || undefined,
+    },
+    { enabled: Boolean(donorGroup), keepPrevious: true },
+  );
+
+  const requests = data?.data ?? [];
+  const total = data?.meta?.total ?? 0;
+  const totalPages = Math.max(
+    1,
+    data?.meta?.totalPages ?? data?.meta?.totalPage ?? 1,
+  );
+
+  // Filters can shrink the result set underneath the current page.
+  useEffect(() => {
+    if (data && page > totalPages) setValues({ page: String(totalPages) });
+  }, [data, page, totalPages, setValues]);
+
+  const resetFilters = () =>
+    setValues({
+      district: "",
+      bloodGroup: "",
+      urgency: "",
+      status: "",
+      page: "1",
+    });
 
   const columns: Column<BloodRequest>[] = [
     {
@@ -145,7 +190,7 @@ export default function OpenRequestsTable() {
       header: "Needed by",
       cell: (request) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
-          {formatDate(request.neededBy)}
+          {formatDateTime(request.neededBy)}
         </span>
       ),
     },
@@ -207,40 +252,123 @@ export default function OpenRequestsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput
           value={values.searchTerm}
           onChange={(searchTerm) => setValues({ searchTerm, page: "1" })}
-          placeholder="Search hospital or area..."
+          placeholder="Search hospital, patient or city..."
           className="lg:max-w-xs"
         />
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterSelect
-            label="Urgency"
-            placeholder="Any urgency"
-            allLabel="Any urgency"
-            value={values.urgency}
-            options={URGENCY_OPTIONS}
-            onChange={(urgency) => setValues({ urgency, page: "1" })}
-          />
-          {userDistrict && (
-            <Button
-              variant={onlyMyDistrict ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setOnlyMyDistrict((current) => !current);
-                setValues({ page: "1" });
-              }}
-            >
-              {onlyMyDistrict ? `Only ${userDistrict}` : "All districts"}
-            </Button>
+        <Button
+          variant={filtersOpen || activeFilterCount > 0 ? "default" : "outline"}
+          size="sm"
+          className="gap-1.5 self-start sm:self-auto"
+          aria-expanded={filtersOpen}
+          aria-controls="open-requests-filters"
+          onClick={() => setFiltersOpen((open) => !open)}
+        >
+          <SlidersHorizontal className="size-4" />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="ml-0.5 flex size-4 items-center justify-center rounded-full bg-primary-foreground text-[10px] font-semibold text-primary">
+              {activeFilterCount}
+            </span>
           )}
-        </div>
+        </Button>
       </div>
+
+      {filtersOpen && (
+        <div
+          id="open-requests-filters"
+          className="space-y-3 rounded-xl border border-border bg-card p-4 animate-in fade-in-50"
+        >
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                District
+              </p>
+              <FilterSelect
+                label="District"
+                placeholder="All districts"
+                allLabel="All districts"
+                value={values.district}
+                options={DISTRICT_OPTIONS}
+                onChange={(district) => setValues({ district, page: "1" })}
+                className="sm:w-full"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Blood group
+              </p>
+              <FilterSelect
+                label="Compatible blood groups"
+                placeholder="All compatible"
+                allLabel="All compatible"
+                value={selectedGroup}
+                options={bloodGroupOptions}
+                onChange={(bloodGroup) => setValues({ bloodGroup, page: "1" })}
+                className="sm:w-full"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Urgency
+              </p>
+              <FilterSelect
+                label="Urgency"
+                placeholder="Any urgency"
+                allLabel="Any urgency"
+                value={values.urgency}
+                options={URGENCY_OPTIONS}
+                onChange={(urgency) => setValues({ urgency, page: "1" })}
+                className="sm:w-full"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Status
+              </p>
+              <FilterSelect
+                label="Status"
+                placeholder="Any status"
+                allLabel="Any status"
+                value={values.status}
+                options={REQUEST_STATUS_OPTIONS}
+                onChange={(status) => setValues({ status, page: "1" })}
+                className="sm:w-full"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {userDistrict && values.district !== userDistrict && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setValues({ district: userDistrict, page: "1" })}
+              >
+                Only my district ({userDistrict})
+              </Button>
+            )}
+            {activeFilterCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1"
+                onClick={resetFilters}
+              >
+                <X className="size-3.5" />
+                Reset filters
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       <DataTableShell
         columns={columns}
-        data={visible}
+        data={requests}
         keyExtractor={(request) => request.id}
         isLoading={isPending}
         skeletonRows={6}
@@ -249,24 +377,31 @@ export default function OpenRequestsTable() {
             icon={Search}
             title="No matching requests"
             description={
-              onlyMyDistrict
-                ? `Nothing in ${userDistrict} right now. Try "All districts" to widen the search.`
-                : "No open requests match your filters. Please check back soon."
+              activeFilterCount > 0 || hasSearch
+                ? "Nothing upcoming matches your current filters. Reset them to see every compatible request."
+                : "There are no upcoming requests your blood group can donate to right now. Please check back soon."
             }
             className="border-none py-6"
+            action={
+              activeFilterCount > 0 ? (
+                <Button size="sm" variant="outline" onClick={resetFilters}>
+                  Reset filters
+                </Button>
+              ) : undefined
+            }
           />
         }
       />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
-          {matches.length} request{matches.length === 1 ? "" : "s"} you can
-          donate to
+          {total} upcoming request{total === 1 ? "" : "s"} you can donate to ·
+          soonest first
         </p>
         <PaginationBar
-          page={safePage}
+          page={Math.min(page, totalPages)}
           totalPages={totalPages}
-          onPageChange={goToPage}
+          onPageChange={(next) => setValues({ page: String(next) })}
         />
       </div>
     </div>

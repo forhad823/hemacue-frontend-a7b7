@@ -7,12 +7,29 @@ import type {
   RequestStatus,
   UpdateBloodRequestPayload,
 } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-export function useBloodRequests(params: BloodRequestQueryParams = {}) {
+interface BloodRequestListOptions {
+  /** Hold the query until its inputs (e.g. the donor's blood group) are known. */
+  enabled?: boolean;
+  /** Keep showing the previous page while the next one loads. */
+  keepPrevious?: boolean;
+}
+
+export function useBloodRequests(
+  params: BloodRequestQueryParams = {},
+  options: BloodRequestListOptions = {},
+) {
   return useQuery({
     queryKey: queryKeys.bloodRequests.all(params),
     queryFn: () => bloodRequestApi.list(params),
+    enabled: options.enabled ?? true,
+    placeholderData: options.keepPrevious ? keepPreviousData : undefined,
   });
 }
 

@@ -10,7 +10,12 @@ import type {
 
 const toQuery = (p: BloodRequestQueryParams = {}) =>
   Object.fromEntries(
-    Object.entries(p).filter(([, v]) => v !== undefined && v !== ""),
+    Object.entries(p)
+      .filter(
+        ([, v]) =>
+          v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0),
+      )
+      .map(([k, v]) => [k, Array.isArray(v) ? v.join(",") : v]),
   );
 
 export const bloodRequestApi = {

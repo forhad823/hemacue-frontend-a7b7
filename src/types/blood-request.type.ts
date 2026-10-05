@@ -88,6 +88,10 @@ export interface BloodRequestQueryParams {
     | "urgency";
   sortOrder?: "asc" | "desc";
   bloodGroup?: BloodGroup;
+  /** Every group to include (sent as a comma-separated list). */
+  bloodGroups?: BloodGroup[];
+  /** ISO instant; only requests needed at or after it are returned. */
+  neededFrom?: string;
   district?: string;
   urgency?: UrgencyLevel;
   status?: RequestStatus;
