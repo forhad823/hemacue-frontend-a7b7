@@ -10,12 +10,21 @@
 
 > **Hemacue** is a modern, high-reliability emergency blood donation and medical logistics web platform built with Next.js 15 App Router, TypeScript, and Tailwind CSS. It bridges the critical gap between blood seekers (patients) and eligible donors through smart compatibility matching, real-time medical eligibility cooldown enforcement (90 days), automated workflow state machines, and integrated bKash Tokenized payments for premium logistics and notification services.
 
+<!--- home page-image --->
+<img src="./public/hemacue-image.png" alt="Hemacue-Home-Page" style="width: 100%; height: auto;">
+<br/>
+
+---
+
+> ## **Live site**: [click here](https://hemacue-frontend.vercel.app/)
+
 ---
 
 ## 📋 Table of Contents
 
 - [✨ Key Features](#-key-features)
 - [🛠 Tech Stack & System Architecture](#-tech-stack--system-architecture)
+- [Dependencies](#-dependencies)
 - [📂 Comprehensive Project Structure](#-comprehensive-project-structure)
 - [🌐 Backend API & Route Integration Matrix](#-backend-api--route-integration-matrix)
 - [🔐 Authentication & Role-Based Security (RBAC)](#-authentication--role-based-security-rbac)
@@ -65,6 +74,29 @@
 - **Formatting & Linting:** Biome.js, ESLint
 
 ---
+
+## Dependencies
+
+- [@base-ui/react](https://www.npmjs.com/package/@base-ui/react)
+- [@react-oauth/google](https://www.npmjs.com/package/@react-oauth/google)
+- [@tanstack/react-form](https://www.npmjs.com/package/@tanstack/react-form)
+- [@tanstack/react-query](https://www.npmjs.com/package/@tanstack/react-query)
+- [class-variance-authority](https://www.npmjs.com/package/class-variance-authority)
+- [cn](https://www.npmjs.com/package/cn)
+- [input-otp](https://www.npmjs.com/package/input-otp)
+- [lucide-react](https://www.npmjs.com/package/lucide-react)
+- [next](https://www.npmjs.com/package/next)
+- [next-themes](https://www.npmjs.com/package/next-themes)
+- [ofetch](https://www.npmjs.com/package/ofetch)
+- [radix-ui](https://www.npmjs.com/package/radix-ui)
+- [react](https://www.npmjs.com/package/react)
+- [react-dom](https://www.npmjs.com/package/react-dom)
+- [react-icons](https://www.npmjs.com/package/react-icons)
+- [recharts](https://www.npmjs.com/package/recharts)
+- [shadcn](https://www.npmjs.com/package/shadcn)
+- [tw-animate-css](https://www.npmjs.com/package/tw-animate-css)
+- [zod](https://www.npmjs.com/package/zod)
+- [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
 ## 📂 Comprehensive Project Structure
 
@@ -434,12 +466,17 @@ For complete technical details on how all 32 backend REST API endpoints map to N
 - **Node.js**: `v18.x` or higher
 - **Backend API**: Running instance of Hemacue Backend (default: `http://localhost:5000/api/v1`)
 
-### 1. Clone & Install
+### 1. Clone & Install frontend and backend
 
 ```bash
-git clone https://github.com/your-username/hemacue-frontend.git
+git clone https://github.com/forhad823/hemacue-frontend-a7b7.git
 cd hemacue-frontend
+pnpm install
+
+git clone https://github.com/forhad823/hemacue-backend-A6-B7.git
+cd hemacue-backend
 npm install
+
 ```
 
 ### 2. Configure Environment Variables (`.env.local`)
@@ -453,6 +490,9 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 
 # Frontend Site URL
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Or you can use https://hemacue-backend.vercel.app/   instead of
+http://localhost:5000
 ```
 
 ### 3. Run Development Server
@@ -479,5 +519,5 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📄 Documentation Links
 
-- [Frontend to Backend API Map (`hemacue-api-map.md`)](file:///E:/code%20and%20relavent%20documets/ph%20zankar%20mahbub/level-2-next-level-web-7/mission-6-fullstack/hemacue-frontend-a7b7/hemacue-api-map.md)
-- [Hemacue Backend API Overview](file:///E:/code%20and%20relavent%20documets/ph%20zankar%20mahbub/level-2-next-level-web-7/mission-6-fullstack/hemacue-frontend-a7b7/project.txt)
+- [Frontend to Backend API Map (`hemacue-api-map.md`)](./hemacue-api-map.md)
+- [Hemacue Backend API Overview](./API-overview-hemacue-backend.md)
