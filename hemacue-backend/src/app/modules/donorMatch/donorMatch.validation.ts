@@ -3,6 +3,7 @@ import {
 	AssignmentStatus,
 	BloodGroup,
 	RequestStatus,
+	UrgencyLevel,
 } from "../../../../generated/prisma/enums";
 
 const UUID_PARAMS = {
@@ -42,6 +43,26 @@ const assignDonorSchema = z.object({
 	requestId: z.uuid("Invalid request id format"),
 });
 
+const myDonationsQuerySchema = z.object({
+	page: z.coerce
+		.number()
+		.int("Page must be an integer")
+		.min(1, "Page must be at least 1")
+		.default(1),
+	limit: z.coerce
+		.number()
+		.int("Limit must be an integer")
+		.min(1, "Limit must be at least 1")
+		.max(100, "Limit must be at most 100")
+		.default(6),
+	sortBy: z.enum(["assignedAt", "neededBy"]).default("assignedAt"),
+	sortOrder: z.enum(["asc", "desc"]).default("desc"),
+	status: z.enum(AssignmentStatus).optional(),
+	urgency: z.enum(UrgencyLevel).optional(),
+	bloodGroup: z.enum(BloodGroup).optional(),
+	searchTerm: z.string().trim().optional(),
+});
+
 export const DonorMatchValidation = {
 	compatibleDonorsQuerySchema,
 	assignDonorSchema,
@@ -49,4 +70,5 @@ export const DonorMatchValidation = {
 	respondToRequestSchema,
 	updateRequestStatusParamsSchema,
 	updateRequestStatusSchema,
+	myDonationsQuerySchema,
 };

@@ -69,13 +69,17 @@ const updateRequestStatus = catchAsync(async (req: Request, res: Response) => {
 
 const getMyDonations = catchAsync(async (req: Request, res: Response) => {
 	const donorId = req.user?.userId as string;
-	const result = await DonorMatchService.getMyDonations(donorId);
+	const result = await DonorMatchService.getMyDonations(
+		donorId,
+		(req.validatedQuery as never) ?? {},
+	);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
 		message: "Donation history retrieved successfully",
-		data: result,
+		meta: result.meta,
+		data: result.data,
 	});
 });
 

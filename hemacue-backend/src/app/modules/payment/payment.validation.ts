@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaymentType } from "../../../../generated/prisma/enums";
+import { PaymentStatus, PaymentType } from "../../../../generated/prisma/enums";
 
 const initiatePaymentSchema = z.object({
 	requestId: z.string().uuid("Invalid request id format"),
@@ -40,7 +40,13 @@ const myPaymentsQuerySchema = z.object({
 		.min(1, "Limit must be at least 1")
 		.max(100, "Limit must be at most 100")
 		.default(10),
+	sortBy: z.enum(["createdAt", "amount"]).default("createdAt"),
 	sortOrder: z.enum(["asc", "desc"]).default("desc"),
+	status: z.enum(PaymentStatus).optional(),
+	paymentType: z
+		.enum([PaymentType.PREMIUM_NOTIFICATION, PaymentType.EMERGENCY_LOGISTICS])
+		.optional(),
+	searchTerm: z.string().trim().optional(),
 });
 
 export const PaymentValidation = {

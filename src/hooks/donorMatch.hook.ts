@@ -1,7 +1,11 @@
 "use client";
 import { donorMatchApi } from "@/api";
 import { queryKeys } from "@/lib/query-keys";
-import type { AssignDonorPayload, CompatibleDonorQueryParams } from "@/types";
+import type {
+  AssignDonorPayload,
+  CompatibleDonorQueryParams,
+  MyDonationsQueryParams,
+} from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useCompatibleDonors(params: CompatibleDonorQueryParams) {
@@ -20,9 +24,10 @@ export function useAssignDonor() {
   });
 }
 
-export function useMyDonations() {
+export function useMyDonations(params: MyDonationsQueryParams = {}) {
   return useQuery({
-    queryKey: queryKeys.donors.myDonations,
-    queryFn: () => donorMatchApi.myDonations(),
+    queryKey: queryKeys.donors.myDonations(params),
+    queryFn: () => donorMatchApi.myDonations(params),
+    placeholderData: (prev) => prev,
   });
 }

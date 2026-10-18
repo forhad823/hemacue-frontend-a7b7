@@ -1,14 +1,17 @@
 "use client";
 
 import { CreditCard, Receipt } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
   DataTableShell,
 } from "@/components/shared/data-table-shell";
 import { EmptyState } from "@/components/shared/empty-state";
+import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { StatCard } from "@/components/shared/stat-card";
 import {
   PaymentStatusBadge,
@@ -17,35 +20,81 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useMyPayments } from "@/hooks";
-import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useTableState } from "@/hooks/use-table-state";
 import { formatCurrency, formatDateTime, humanizeToken } from "@/lib/format";
-import type { PaymentWithRequest } from "@/types";
+import type { PaymentStatus, PaymentType, PaymentWithRequest } from "@/types";
 
 const PAGE_SIZE = 10;
 
-const DEFAULTS = { page: "1" };
+const PAYMENT_STATUS_OPTIONS = [
+  { value: "INITIALIZED", label: "Initialized" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "FAILED", label: "Failed" },
+  { value: "CANCELLED", label: "Cancelled" },
+] as const;
+
+const PAYMENT_TYPE_OPTIONS = [
+  { value: "PREMIUM_NOTIFICATION", label: "Premium Notification" },
+  { value: "EMERGENCY_LOGISTICS", label: "Emergency Logistics" },
+] as const;
 
 export default function PaymentHistoryTable() {
-  const { values, setValues } = useSearchParamsState(DEFAULTS);
+  const {
+    page,
+    sort,
+    filters,
+    searchTerm,
+    setPage,
+    setSort,
+    setSearch,
+    setFilter,
+  } = useTableState({
+    sortFields: ["createdAt", "amount"],
+    defaultSort: { field: "createdAt", order: "desc" },
+    filterKeys: ["status", "paymentType"],
+    pageSize: PAGE_SIZE,
+  });
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const page = Number(values.page) || 1;
-  const { data, isPending } = useMyPayments({ page, limit: PAGE_SIZE });
+  const params = useMemo(
+    () => ({
+      page,
+      limit: PAGE_SIZE,
+      searchTerm: debouncedSearch || undefined,
+      sortBy: sort.field as "createdAt" | "amount",
+      sortOrder: sort.order,
+      status: (filters.status || undefined) as PaymentStatus | undefined,
+      paymentType: (filters.paymentType || undefined) as
+        | PaymentType
+        | undefined,
+    }),
+    [
+      page,
+      sort.field,
+      sort.order,
+      debouncedSearch,
+      filters.status,
+      filters.paymentType,
+    ],
+  );
+
+  const { data, isPending, isFetching } = useMyPayments(params);
   const payments = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const completed = payments.filter(
-    (payment) => payment.status === "COMPLETED",
-  );
+  const completed = payments.filter((p) => p.status === "COMPLETED");
   const lifetimeSpend = completed.reduce(
-    (total, payment) => total + Number(payment.amount),
+    (total, p) => total + Number(p.amount),
     0,
   );
-  const refunded = payments.filter((payment) => payment.status === "CANCELLED");
+  const refunded = payments.filter((p) => p.status === "CANCELLED");
 
   const goToPage = (nextPage: number) =>
-    setValues({ page: String(Math.min(Math.max(nextPage, 1), totalPages)) });
+    setPage(Math.min(Math.max(nextPage, 1), totalPages));
 
   const copyId = async (paymentID: string) => {
     try {
@@ -94,7 +143,14 @@ export default function PaymentHistoryTable() {
     },
     {
       id: "amount",
-      header: "Amount",
+      header: (
+        <SortableHeader
+          label="Amount"
+          field="amount"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (payment) => (
         <span className="whitespace-nowrap font-medium tabular-nums">
           {formatCurrency(Number(payment.amount), payment.currency)}
@@ -109,7 +165,9 @@ export default function PaymentHistoryTable() {
     {
       id: "requestStatus",
       header: "Request status",
-      cell: (payment) => <RequestStatusBadge status={payment.request.status} />,
+      cell: (payment) => (
+        <RequestStatusBadge status={payment.request.status} />
+      ),
     },
     {
       id: "trx",
@@ -127,7 +185,14 @@ export default function PaymentHistoryTable() {
     },
     {
       id: "paidAt",
-      header: "Date",
+      header: (
+        <SortableHeader
+          label="Date"
+          field="createdAt"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (payment) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDateTime(payment.paidAt ?? payment.createdAt)}
@@ -153,6 +218,7 @@ export default function PaymentHistoryTable() {
 
   return (
     <div className="space-y-4">
+      {/* Summary stat cards */}
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Payments"
@@ -176,6 +242,41 @@ export default function PaymentHistoryTable() {
         />
       </div>
 
+      {/* Toolbar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearch}
+          placeholder="Search by patient or Trx ID..."
+          className="sm:max-w-xs"
+        />
+        <div className="flex flex-wrap gap-2">
+          <FilterSelect
+            label="Status"
+            placeholder="All statuses"
+            allLabel="All statuses"
+            value={filters.status}
+            options={PAYMENT_STATUS_OPTIONS}
+            onChange={(v) => setFilter("status", v)}
+          />
+          <FilterSelect
+            label="Type"
+            placeholder="All types"
+            allLabel="All types"
+            value={filters.paymentType}
+            options={PAYMENT_TYPE_OPTIONS}
+            onChange={(v) => setFilter("paymentType", v)}
+          />
+        </div>
+      </div>
+
+      {isFetching && !isPending && (
+        <div
+          className="h-1 w-full animate-pulse rounded-full bg-muted"
+          aria-hidden
+        />
+      )}
+
       <DataTableShell
         columns={columns}
         data={payments}
@@ -184,7 +285,7 @@ export default function PaymentHistoryTable() {
         emptyState={
           <EmptyState
             icon={CreditCard}
-            title="No payments yet"
+            title="No payments found"
             description="Premium notification and emergency logistics payments will appear here with their bKash transaction ID."
             className="border-none py-6"
           />

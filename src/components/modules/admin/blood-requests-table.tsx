@@ -1,8 +1,8 @@
 "use client";
 
-import { ExternalLink, Search } from "lucide-react";
-import Link from "next/link";
+import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
 import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import {
@@ -27,7 +28,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useBloodRequests, useUpdateRequestStatus } from "@/hooks";
-import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { useTableState } from "@/hooks/use-table-state";
+import { useDebounce } from "@/hooks/use-debounce";
 import {
   BLOOD_GROUP_OPTIONS,
   DISTRICTS,
@@ -44,20 +46,28 @@ import { RequestStatus as RequestStatusEnum } from "@/types";
 
 const PAGE_SIZE = 10;
 
-const DEFAULTS = {
-  page: "1",
-  searchTerm: "",
-  status: "",
-  bloodGroup: "",
-  district: "",
-  urgency: "",
-};
-
 /** Statuses an admin can push a request into from the table itself. */
 const QUICK_STATUSES: RequestStatus[] = ["VERIFIED", "CANCELLED"];
 
 export default function AdminBloodRequestsTable() {
-  const { values, setValues } = useSearchParamsState(DEFAULTS);
+  const {
+    page,
+    sort,
+    filters,
+    searchTerm,
+    setPage,
+    setSort,
+    setSearch,
+    setFilter,
+  } = useTableState({
+    sortFields: ["patientName", "neededBy", "bloodGroup", "urgency", "status", "createdAt"],
+    defaultSort: { field: "createdAt", order: "desc" },
+    filterKeys: ["status", "bloodGroup", "district", "urgency"],
+    pageSize: PAGE_SIZE,
+  });
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
   const [pendingStatus, setPendingStatus] = useState<{
     request: BloodRequest;
     status: RequestStatus;
@@ -66,22 +76,25 @@ export default function AdminBloodRequestsTable() {
 
   const params = useMemo(
     () => ({
-      page: Number(values.page) || 1,
+      page,
       limit: PAGE_SIZE,
-      searchTerm: values.searchTerm || undefined,
-      status: (values.status || undefined) as RequestStatus | undefined,
-      bloodGroup: (values.bloodGroup ||
-        undefined) as BloodRequest["bloodGroup"],
-      district: values.district || undefined,
-      urgency: (values.urgency || undefined) as BloodRequest["urgency"],
+      searchTerm: debouncedSearch || undefined,
+      sortBy: sort.field as "createdAt" | "neededBy" | "patientName" | "bloodGroup" | "urgency",
+      sortOrder: sort.order,
+      status: (filters.status || undefined) as RequestStatus | undefined,
+      bloodGroup: (filters.bloodGroup || undefined) as BloodRequest["bloodGroup"],
+      district: filters.district || undefined,
+      urgency: (filters.urgency || undefined) as BloodRequest["urgency"],
     }),
     [
-      values.bloodGroup,
-      values.district,
-      values.page,
-      values.searchTerm,
-      values.status,
-      values.urgency,
+      page,
+      sort.field,
+      sort.order,
+      debouncedSearch,
+      filters.status,
+      filters.bloodGroup,
+      filters.district,
+      filters.urgency,
     ],
   );
 
@@ -90,8 +103,8 @@ export default function AdminBloodRequestsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (page: number) =>
-    setValues({ page: String(Math.min(Math.max(page, 1), totalPages)) });
+  const goToPage = (p: number) =>
+    setPage(Math.min(Math.max(p, 1), totalPages));
 
   const confirmStatusChange = () => {
     if (!pendingStatus) return;
@@ -118,7 +131,14 @@ export default function AdminBloodRequestsTable() {
   const columns: Column<BloodRequest>[] = [
     {
       id: "patient",
-      header: "Patient",
+      header: (
+        <SortableHeader
+          label="Patient"
+          field="patientName"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => (
         <div className="min-w-0">
           <p className="truncate font-medium text-foreground">
@@ -133,7 +153,14 @@ export default function AdminBloodRequestsTable() {
     },
     {
       id: "bloodGroup",
-      header: "Group",
+      header: (
+        <SortableHeader
+          label="Group"
+          field="bloodGroup"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => <BloodGroupBadge group={request.bloodGroup} />,
     },
     {
@@ -150,12 +177,26 @@ export default function AdminBloodRequestsTable() {
     },
     {
       id: "urgency",
-      header: "Urgency",
+      header: (
+        <SortableHeader
+          label="Urgency"
+          field="urgency"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => <UrgencyBadge urgency={request.urgency} />,
     },
     {
       id: "neededBy",
-      header: "Needed by",
+      header: (
+        <SortableHeader
+          label="Needed by"
+          field="neededBy"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDate(request.neededBy)}
@@ -173,7 +214,14 @@ export default function AdminBloodRequestsTable() {
     },
     {
       id: "status",
-      header: "Status",
+      header: (
+        <SortableHeader
+          label="Status"
+          field="status"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => <RequestStatusBadge status={request.status} />,
     },
     {
@@ -200,7 +248,7 @@ export default function AdminBloodRequestsTable() {
                 </Button>
 
                 <Button
-                  key={status}
+                  key={`${status}-details`}
                   variant="outline"
                   size="sm"
                   className="cursor-pointer"
@@ -211,17 +259,6 @@ export default function AdminBloodRequestsTable() {
                 </Button>
               </span>
             ))}
-
-            {/* <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Open request for ${request.patientName}`}
-              render={<Link href={`/patient/requests/${request.id}`} />}
-              
-            >
-              <ExternalLink className="size-4" />
-
-            </Button> */}
           </div>
         );
       },
@@ -232,8 +269,8 @@ export default function AdminBloodRequestsTable() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <SearchInput
-          value={values.searchTerm}
-          onChange={(searchTerm) => setValues({ searchTerm, page: "1" })}
+          value={searchTerm}
+          onChange={(v) => setSearch(v)}
           placeholder="Search patient, hospital or city..."
           className="lg:max-w-xs"
         />
@@ -242,36 +279,36 @@ export default function AdminBloodRequestsTable() {
             label="Status"
             placeholder="All statuses"
             allLabel="All statuses"
-            value={values.status}
+            value={filters.status}
             options={REQUEST_STATUS_OPTIONS}
-            onChange={(status) => setValues({ status, page: "1" })}
+            onChange={(v) => setFilter("status", v)}
           />
           <FilterSelect
             label="Urgency"
             placeholder="All urgencies"
             allLabel="All urgencies"
-            value={values.urgency}
+            value={filters.urgency}
             options={URGENCY_OPTIONS}
-            onChange={(urgency) => setValues({ urgency, page: "1" })}
+            onChange={(v) => setFilter("urgency", v)}
           />
           <FilterSelect
             label="Blood group"
             placeholder="All groups"
             allLabel="All groups"
-            value={values.bloodGroup}
+            value={filters.bloodGroup}
             options={BLOOD_GROUP_OPTIONS}
-            onChange={(bloodGroup) => setValues({ bloodGroup, page: "1" })}
+            onChange={(v) => setFilter("bloodGroup", v)}
           />
           <FilterSelect
             label="District"
             placeholder="All districts"
             allLabel="All districts"
-            value={values.district}
+            value={filters.district}
             options={DISTRICTS.map((district) => ({
               value: district,
               label: district,
             }))}
-            onChange={(district) => setValues({ district, page: "1" })}
+            onChange={(v) => setFilter("district", v)}
           />
         </div>
       </div>

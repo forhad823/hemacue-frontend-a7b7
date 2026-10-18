@@ -6,6 +6,7 @@ export interface NavLink {
 /** Primary navigation shared by the public header (desktop + mobile) and the footer. */
 export const PUBLIC_NAV_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
+  { href: "/explore", label: "Explore" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/contact", label: "Contact" },

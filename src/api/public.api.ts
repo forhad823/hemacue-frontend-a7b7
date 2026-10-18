@@ -1,4 +1,4 @@
-import type { ApiResponse, BloodRequest, PublicLiveStats } from "@/types";
+import type { ApiResponse, BloodRequest, BloodRequestQueryParams, PublicLiveStats } from "@/types";
 import { RequestStatus, UrgencyLevel } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -51,6 +51,24 @@ export const publicApi = {
       sortOrder: "asc",
     });
     return res?.data ?? [];
+  },
+
+  /**
+   * General-purpose public blood-request listing used by the Explore page.
+   * Accepts the full BloodRequestQueryParams so the client can filter/sort/page.
+   * Returns null when the backend is unreachable — callers must handle null.
+   * Cached and revalidated every 60 s via ISR.
+   */
+  listRequests: async (
+    query: BloodRequestQueryParams = {},
+  ): Promise<ApiResponse<BloodRequest[]> | null> => {
+    const params: Record<string, string> = {};
+    for (const [k, v] of Object.entries(query)) {
+      if (v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0)) {
+        params[k] = Array.isArray(v) ? v.join(",") : String(v);
+      }
+    }
+    return fetchPublicRequests(params);
   },
 
   /**

@@ -3,6 +3,7 @@ import type {
   AuditLogsQueryParams,
   BloodRequestQueryParams,
   CompatibleDonorQueryParams,
+  MyDonationsQueryParams,
   MyPaymentsQueryParams,
 } from "@/types";
 
@@ -20,7 +21,8 @@ export const queryKeys = {
   donors: {
     compatible: (p: CompatibleDonorQueryParams) =>
       ["donors", "compatible", p] as const,
-    myDonations: ["donors", "my-donations"] as const,
+    myDonations: (p?: MyDonationsQueryParams) =>
+      ["donors", "my-donations", p] as const,
   },
   payments: {
     byId: (id: string) => ["payments", id] as const,

@@ -20,6 +20,7 @@ donorMatchesRouter.get(
 donorMatchesRouter.get(
 	"/my-donations",
 	auth(UserRole.DONOR),
+	validateRequest({ query: DonorMatchValidation.myDonationsQuerySchema }),
 	DonorMatchController.getMyDonations,
 );
 

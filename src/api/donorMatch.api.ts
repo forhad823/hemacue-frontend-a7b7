@@ -6,7 +6,15 @@ import type {
   CompatibleDonorQueryParams,
   DonorAssignment,
   MyDonation,
+  MyDonationsQueryParams,
 } from "@/types";
+
+const toQuery = (p: MyDonationsQueryParams): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(p)
+      .filter(([, v]) => v !== undefined && v !== "")
+      .map(([k, v]) => [k, String(v)]),
+  );
 
 export const donorMatchApi = {
   compatibleDonors: (p: CompatibleDonorQueryParams) =>
@@ -21,8 +29,9 @@ export const donorMatchApi = {
       body: p,
     }),
 
-  myDonations: () =>
+  myDonations: (p: MyDonationsQueryParams = {}) =>
     apiClient<ApiResponse<MyDonation[]>>("/donor-matches/my-donations", {
       method: "GET",
+      query: toQuery(p),
     }),
 };

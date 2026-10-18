@@ -9,7 +9,10 @@ import {
   DataTableShell,
 } from "@/components/shared/data-table-shell";
 import { EmptyState } from "@/components/shared/empty-state";
+import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import {
   AssignmentStatusBadge,
   RequestStatusBadge,
@@ -19,32 +22,77 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { useMyDonations, useRespondToRequest } from "@/hooks";
-import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useTableState } from "@/hooks/use-table-state";
+import { BLOOD_GROUP_OPTIONS, URGENCY_OPTIONS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
-import type { MyDonation } from "@/types";
+import type {
+  AssignmentStatus,
+  BloodGroup,
+  MyDonation,
+  UrgencyLevel,
+} from "@/types";
 
 const PAGE_SIZE = 6;
 
 const OPEN_STATUSES = ["VERIFIED", "DONOR_ASSIGNED", "IN_PROGRESS"];
 
-/** Donor assignment history with accept / decline, paginated from the URL. */
+const ASSIGNMENT_STATUS_OPTIONS = [
+  { value: "NOTIFIED", label: "Notified" },
+  { value: "ACCEPTED", label: "Accepted" },
+  { value: "DECLINED", label: "Declined" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+] as const;
+
+/** Donor assignment history with search, filters, sort and server-side pagination. */
 export default function MyDonationsTable() {
-  const { values, setValues } = useSearchParamsState({ page: "1" });
-  const { data, isPending } = useMyDonations();
+  const {
+    page,
+    sort,
+    filters,
+    searchTerm,
+    setPage,
+    setSort,
+    setSearch,
+    setFilter,
+  } = useTableState({
+    sortFields: ["assignedAt", "neededBy"],
+    defaultSort: { field: "assignedAt", order: "desc" },
+    filterKeys: ["status", "urgency", "bloodGroup"],
+    pageSize: PAGE_SIZE,
+  });
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const respond = useRespondToRequest();
 
-  const donations = useMemo(() => {
-    const list = [...(data?.data ?? [])].sort(
-      (a, b) =>
-        new Date(b.assignedAt).getTime() - new Date(a.assignedAt).getTime(),
-    );
-    const page = Number(values.page) || 1;
-    return list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  }, [data, values.page]);
+  const params = useMemo(
+    () => ({
+      page,
+      limit: PAGE_SIZE,
+      searchTerm: debouncedSearch || undefined,
+      sortBy: sort.field as "assignedAt" | "neededBy",
+      sortOrder: sort.order,
+      status: (filters.status || undefined) as AssignmentStatus | undefined,
+      urgency: (filters.urgency || undefined) as UrgencyLevel | undefined,
+      bloodGroup: (filters.bloodGroup || undefined) as BloodGroup | undefined,
+    }),
+    [
+      page,
+      sort.field,
+      sort.order,
+      debouncedSearch,
+      filters.status,
+      filters.urgency,
+      filters.bloodGroup,
+    ],
+  );
 
-  const allDonations = data?.data ?? [];
-  const totalPages = Math.max(1, Math.ceil(allDonations.length / PAGE_SIZE));
+  const { data, isPending, isFetching } = useMyDonations(params);
+  const donations = data?.data ?? [];
+  const meta = data?.meta;
+  const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
   const handleRespond = (
     donation: MyDonation,
@@ -57,9 +105,7 @@ export default function MyDonationsTable() {
         onSuccess: () =>
           toast.add({
             title:
-              response === "ACCEPTED"
-                ? "Donation accepted"
-                : "Donation declined",
+              response === "ACCEPTED" ? "Donation accepted" : "Donation declined",
             description:
               response === "ACCEPTED"
                 ? `${donation.request.patientName} has been notified. Please report to ${donation.request.hospitalName}.`
@@ -119,7 +165,14 @@ export default function MyDonationsTable() {
     },
     {
       id: "neededBy",
-      header: "Needed by",
+      header: (
+        <SortableHeader
+          label="Needed by"
+          field="neededBy"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (donation) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDate(donation.request.neededBy)}
@@ -128,7 +181,14 @@ export default function MyDonationsTable() {
     },
     {
       id: "assignment",
-      header: "My response",
+      header: (
+        <SortableHeader
+          label="Assigned on"
+          field="assignedAt"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (donation) => (
         <div>
           <AssignmentStatusBadge status={donation.status} />
@@ -197,7 +257,50 @@ export default function MyDonationsTable() {
   ];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearch}
+          placeholder="Search patient or hospital..."
+          className="sm:max-w-xs"
+        />
+        <div className="flex flex-wrap gap-2">
+          <FilterSelect
+            label="Status"
+            placeholder="All statuses"
+            allLabel="All statuses"
+            value={filters.status}
+            options={ASSIGNMENT_STATUS_OPTIONS}
+            onChange={(v) => setFilter("status", v)}
+          />
+          <FilterSelect
+            label="Urgency"
+            placeholder="All urgencies"
+            allLabel="All urgencies"
+            value={filters.urgency}
+            options={URGENCY_OPTIONS}
+            onChange={(v) => setFilter("urgency", v)}
+          />
+          <FilterSelect
+            label="Blood group"
+            placeholder="All groups"
+            allLabel="All groups"
+            value={filters.bloodGroup}
+            options={BLOOD_GROUP_OPTIONS}
+            onChange={(v) => setFilter("bloodGroup", v)}
+          />
+        </div>
+      </div>
+
+      {isFetching && !isPending && (
+        <div
+          className="h-1 w-full animate-pulse rounded-full bg-muted"
+          aria-hidden
+        />
+      )}
+
       <DataTableShell
         columns={columns}
         data={donations}
@@ -207,7 +310,7 @@ export default function MyDonationsTable() {
         emptyState={
           <EmptyState
             icon={HeartHandshake}
-            title="No donations yet"
+            title="No donations found"
             description="When a patient request matches your blood group it appears here with accept and decline buttons."
             className="border-none py-6"
           />
@@ -216,13 +319,14 @@ export default function MyDonationsTable() {
 
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
-          {allDonations.length} assignment{allDonations.length === 1 ? "" : "s"}{" "}
-          in total
+          {meta
+            ? `${meta.total} assignment${meta.total === 1 ? "" : "s"} in total`
+            : ""}
         </p>
         <PaginationBar
-          page={Number(values.page) || 1}
+          page={page}
           totalPages={totalPages}
-          onPageChange={(page) => setValues({ page: String(page) })}
+          onPageChange={setPage}
         />
       </div>
     </div>

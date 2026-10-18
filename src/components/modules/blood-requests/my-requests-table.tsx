@@ -12,34 +12,48 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
 import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
 import { useMyBloodRequests } from "@/hooks";
-import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { useTableState } from "@/hooks/use-table-state";
+import { useDebounce } from "@/hooks/use-debounce";
 import { REQUEST_STATUS_OPTIONS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import type { BloodRequest, RequestStatus } from "@/types";
 
 const PAGE_SIZE = 8;
 
-const DEFAULTS = {
-  page: "1",
-  searchTerm: "",
-  status: "",
-};
-
 export default function MyRequestsTable() {
-  const { values, setValues } = useSearchParamsState(DEFAULTS);
+  const {
+    page,
+    sort,
+    filters,
+    searchTerm,
+    setPage,
+    setSort,
+    setSearch,
+    setFilter,
+  } = useTableState({
+    sortFields: ["createdAt", "neededBy"],
+    defaultSort: { field: "createdAt", order: "desc" },
+    filterKeys: ["status"],
+    pageSize: PAGE_SIZE,
+  });
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
 
   const params = useMemo(
     () => ({
-      page: Number(values.page) || 1,
+      page,
       limit: PAGE_SIZE,
-      searchTerm: values.searchTerm || undefined,
-      status: (values.status || undefined) as RequestStatus | undefined,
+      searchTerm: debouncedSearch || undefined,
+      sortBy: sort.field as "createdAt" | "neededBy",
+      sortOrder: sort.order,
+      status: (filters.status || undefined) as RequestStatus | undefined,
     }),
-    [values.page, values.searchTerm, values.status],
+    [page, sort.field, sort.order, debouncedSearch, filters.status],
   );
 
   const { data, isPending, isFetching } = useMyBloodRequests(params);
@@ -47,8 +61,8 @@ export default function MyRequestsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (page: number) =>
-    setValues({ page: String(Math.min(Math.max(page, 1), totalPages)) });
+  const goToPage = (p: number) =>
+    setPage(Math.min(Math.max(p, 1), totalPages));
 
   const columns: Column<BloodRequest>[] = [
     {
@@ -90,7 +104,14 @@ export default function MyRequestsTable() {
     },
     {
       id: "neededBy",
-      header: "Needed by",
+      header: (
+        <SortableHeader
+          label="Needed by"
+          field="neededBy"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (request) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDate(request.neededBy)}
@@ -110,6 +131,22 @@ export default function MyRequestsTable() {
       id: "status",
       header: "Status",
       cell: (request) => <RequestStatusBadge status={request.status} />,
+    },
+    {
+      id: "created",
+      header: (
+        <SortableHeader
+          label="Posted"
+          field="createdAt"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
+      cell: (request) => (
+        <span className="whitespace-nowrap text-xs text-muted-foreground">
+          {formatDate(request.createdAt)}
+        </span>
+      ),
     },
     {
       id: "actions",
@@ -132,8 +169,8 @@ export default function MyRequestsTable() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput
-          value={values.searchTerm}
-          onChange={(searchTerm) => setValues({ searchTerm, page: "1" })}
+          value={searchTerm}
+          onChange={(v) => setSearch(v)}
           placeholder="Search patient or hospital..."
           className="sm:max-w-xs"
         />
@@ -142,18 +179,10 @@ export default function MyRequestsTable() {
             label="Status"
             placeholder="All statuses"
             allLabel="All statuses"
-            value={values.status}
+            value={filters.status}
             options={REQUEST_STATUS_OPTIONS}
-            onChange={(status) => setValues({ status, page: "1" })}
+            onChange={(v) => setFilter("status", v)}
           />
-          {/* <Button
-            size="sm"
-            className="gap-1.5"
-            render={<Link href="/patient/new" />}
-          >
-            <FilePlus2 className="size-4" />
-            New request
-          </Button> */}
         </div>
       </div>
 
@@ -171,19 +200,19 @@ export default function MyRequestsTable() {
         isLoading={isPending}
         emptyState={
           <EmptyState
-            icon={values.status || values.searchTerm ? Inbox : Droplets}
+            icon={filters.status || searchTerm ? Inbox : Droplets}
             title={
-              values.status || values.searchTerm
+              filters.status || searchTerm
                 ? "No requests match these filters"
                 : "You have not posted a request yet"
             }
             description={
-              values.status || values.searchTerm
+              filters.status || searchTerm
                 ? "Clear the filters to see every request you have posted."
                 : "Post a request and verified donors in your district will be notified."
             }
             action={
-              values.status || values.searchTerm ? undefined : (
+              filters.status || searchTerm ? undefined : (
                 <Button
                   size="sm"
                   className="gap-1.5"

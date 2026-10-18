@@ -49,7 +49,11 @@ export interface RefundPaymentPayload {
 export interface MyPaymentsQueryParams {
   page?: number;
   limit?: number;
+  sortBy?: "createdAt" | "amount";
   sortOrder?: "asc" | "desc";
+  status?: PaymentStatus;
+  paymentType?: PaymentType;
+  searchTerm?: string;
 }
 
 /** Request summary embedded in `GET /payments/mine` rows. */

@@ -96,7 +96,7 @@ export function useRespondToRequest() {
     }) => bloodRequestApi.respond(id, response),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["blood-requests"] });
-      qc.invalidateQueries({ queryKey: queryKeys.donors.myDonations });
+      qc.invalidateQueries({ queryKey: ["donors", "my-donations"] });
     },
   });
 }

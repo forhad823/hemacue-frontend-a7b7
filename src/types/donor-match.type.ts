@@ -1,5 +1,17 @@
-import type { AssignmentStatus, BloodGroup, RequestStatus } from "./enums.type";
+import type { AssignmentStatus, BloodGroup, RequestStatus, UrgencyLevel } from "./enums.type";
 import type { BloodRequest } from "./blood-request.type";
+
+/** Query params forwarded to GET /donor-matches/my-donations */
+export interface MyDonationsQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "assignedAt" | "neededBy";
+  sortOrder?: "asc" | "desc";
+  status?: AssignmentStatus;
+  urgency?: UrgencyLevel;
+  bloodGroup?: BloodGroup;
+  searchTerm?: string;
+}
 
 export interface CompatibleDonor {
   id: string;

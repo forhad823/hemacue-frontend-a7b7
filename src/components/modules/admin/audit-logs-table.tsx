@@ -10,22 +10,16 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
 import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuditLogs } from "@/hooks";
-import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { useTableState } from "@/hooks/use-table-state";
 import { AUDIT_ACTION_OPTIONS } from "@/lib/constants";
 import { formatDateTime, humanizeToken } from "@/lib/format";
 import type { AuditLog } from "@/types";
 
 const PAGE_SIZE = 15;
-
-const DEFAULTS = {
-  page: "1",
-  actorEmail: "",
-  action: "",
-  entity: "",
-};
 
 const ENTITY_OPTIONS = [
   { value: "User", label: "User" },
@@ -68,19 +62,31 @@ function describeDetails(details: Record<string, unknown> | null): string {
 }
 
 export default function AuditLogsTable() {
-  const { values, setValues } = useSearchParamsState(DEFAULTS);
+  const {
+    page,
+    sort,
+    filters,
+    setPage,
+    setSort,
+    setFilter,
+  } = useTableState({
+    sortFields: ["createdAt"],
+    defaultSort: { field: "createdAt", order: "desc" },
+    filterKeys: ["action", "entity", "actorEmail"],
+    pageSize: PAGE_SIZE,
+  });
 
   const params = useMemo(
     () => ({
-      page: Number(values.page) || 1,
+      page,
       limit: PAGE_SIZE,
       sortBy: "createdAt" as const,
-      sortOrder: "desc" as const,
-      actorEmail: values.actorEmail || undefined,
-      action: values.action || undefined,
-      entity: values.entity || undefined,
+      sortOrder: sort.order,
+      actorEmail: filters.actorEmail || undefined,
+      action: filters.action || undefined,
+      entity: filters.entity || undefined,
     }),
-    [values.action, values.actorEmail, values.entity, values.page],
+    [page, sort.order, filters.action, filters.actorEmail, filters.entity],
   );
 
   const { data, isPending, isFetching } = useAuditLogs(params);
@@ -88,13 +94,20 @@ export default function AuditLogsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (page: number) =>
-    setValues({ page: String(Math.min(Math.max(page, 1), totalPages)) });
+  const goToPage = (p: number) =>
+    setPage(Math.min(Math.max(p, 1), totalPages));
 
   const columns: Column<AuditLog>[] = [
     {
       id: "when",
-      header: "When",
+      header: (
+        <SortableHeader
+          label="When"
+          field="createdAt"
+          sort={sort}
+          onSort={setSort}
+        />
+      ),
       cell: (log) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDateTime(log.createdAt)}
@@ -171,8 +184,8 @@ export default function AuditLogsTable() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <SearchInput
-          value={values.actorEmail}
-          onChange={(actorEmail) => setValues({ actorEmail, page: "1" })}
+          value={filters.actorEmail}
+          onChange={(actorEmail) => setFilter("actorEmail", actorEmail)}
           placeholder="Search actor email..."
           className="lg:max-w-xs"
         />
@@ -181,20 +194,20 @@ export default function AuditLogsTable() {
             label="Action"
             placeholder="All actions"
             allLabel="All actions"
-            value={values.action}
+            value={filters.action}
             options={AUDIT_ACTION_OPTIONS.map((action) => ({
               value: action,
               label: humanizeToken(action),
             }))}
-            onChange={(action) => setValues({ action, page: "1" })}
+            onChange={(action) => setFilter("action", action)}
           />
           <FilterSelect
             label="Entity"
             placeholder="All entities"
             allLabel="All entities"
-            value={values.entity}
+            value={filters.entity}
             options={ENTITY_OPTIONS}
-            onChange={(entity) => setValues({ entity, page: "1" })}
+            onChange={(entity) => setFilter("entity", entity)}
           />
         </div>
       </div>

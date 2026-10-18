@@ -8,3 +8,4 @@ export * from "./use-debounce";
 export * from "./use-countdown";
 export * from "./use-search-params-state";
 export * from "./use-mobile";
+export * from "./use-table-state";
