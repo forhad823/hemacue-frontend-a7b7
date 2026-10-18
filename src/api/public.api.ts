@@ -35,6 +35,25 @@ async function fetchPublicRequests(
 
 export const publicApi = {
   /**
+   * Returns the most urgent VERIFIED requests for the home page featured section.
+   * Sorted by neededBy (soonest first), limited to `limit` items.
+   * Returns an empty array when the backend is unreachable so the section
+   * degrades gracefully. Cached and revalidated every 60 s via ISR.
+   *
+   * Step 2 will expose a dedicated `/public/featured-requests` endpoint;
+   * that swap will be a one-line change here and must not touch the JSX.
+   */
+  getFeaturedRequests: async (limit = 6): Promise<BloodRequest[]> => {
+    const res = await fetchPublicRequests({
+      limit: String(limit),
+      status: RequestStatus.VERIFIED,
+      sortBy: "neededBy",
+      sortOrder: "asc",
+    });
+    return res?.data ?? [];
+  },
+
+  /**
    * Aggregates the public counters shown on the landing/about pages from the
    * unauthenticated `GET /blood-requests` endpoint. Resolves to `null` when the
    * backend is unreachable so the pages can still render their static content.

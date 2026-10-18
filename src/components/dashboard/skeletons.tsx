@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /** Grid of stat-card placeholders used by every dashboard overview loading state. */
@@ -84,5 +84,54 @@ export function DetailSkeleton() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+/**
+ * Responsive card-grid placeholder used by FeaturedRequests (home page),
+ * the public Explore page, and any future ListingCard grid.
+ * Matches the `grid gap-6 sm:grid-cols-2 lg:grid-cols-3` layout of ListingGrid.
+ */
+export function ListingGridSkeleton({ count = 6 }: { count?: number }) {
+  const slots = Array.from({ length: count }, (_, index) => `listing-${index}`);
+
+  return (
+    <section className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+      {/* Section heading placeholder */}
+      <div className="mb-10 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-6 w-72" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <Skeleton className="h-8 w-36 shrink-0" />
+      </div>
+
+      {/* Card grid */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {slots.map((slot) => (
+          <Card key={slot} className="overflow-hidden">
+            {/* Image area */}
+            <Skeleton className="h-44 w-full rounded-none" />
+            <CardHeader>
+              <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-5/6" />
+              <div className="flex gap-3 pt-1">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Skeleton className="h-8 w-28" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </section>
   );
 }
