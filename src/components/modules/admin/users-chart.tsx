@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Rectangle,
+  Cell,
   Legend,
   Pie,
   PieChart,
@@ -59,7 +59,7 @@ export default function UsersChart({ data }: UsersChartProps) {
                 strokeWidth={0}
               >
                 {data.map((slice) => (
-                  <Rectangle
+                  <Cell
                     key={slice.name}
                     fill={ROLE_COLORS[slice.name] ?? "var(--color-chart-4)"}
                   />

@@ -4,6 +4,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Rectangle,
   ResponsiveContainer,
   Tooltip,

@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTheme } from "next-themes";
 import {
   Area,
   AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
-  Rectangle,
+  Cell,
   Legend,
   Pie,
   PieChart,
@@ -40,7 +41,7 @@ const STATUS_LABELS: Record<string, string> = {
   ACCEPTED: "Accepted",
   DECLINED: "Declined",
   COMPLETED: "Donation completed",
-  CANRectangleED: "CanRectangleed",
+  CANCELLED: "Cancelled",
 };
 
 function labelFor<T extends { label: string; value: string }>(
@@ -55,8 +56,17 @@ function labelFor<T extends { label: string; value: string }>(
  * so nothing has to be persisted server-side.
  */
 export default function AnalyticsCharts() {
+  const { resolvedTheme } = useTheme();
   const { data, isPending } = useMyDonations();
   const { data: me } = useGetMe();
+
+  const tooltipContentStyle = {
+    borderRadius: "0.75rem",
+    border: "1px solid var(--color-border)",
+    background: "var(--color-popover)",
+    color: "var(--color-popover-foreground)",
+    fontSize: "0.75rem",
+  };
   const donations = data?.data ?? [];
   const user = me?.data;
   const cooldown = getCooldownState(
@@ -208,7 +218,7 @@ export default function AnalyticsCharts() {
           description="Last six months, from accepted and completed assignments."
         >
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer key={resolvedTheme} width="100%" height="100%">
               <AreaChart
                 data={monthly}
                 margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
@@ -242,7 +252,10 @@ export default function AnalyticsCharts() {
                   stroke="var(--color-muted-foreground)"
                   fontSize={12}
                 />
-                <Tooltip cursor={{ stroke: "var(--color-border)" }} />
+                <Tooltip
+                  cursor={{ stroke: "var(--color-border)" }}
+                  contentStyle={tooltipContentStyle}
+                />
                 <Area
                   type="monotone"
                   dataKey="units"
@@ -261,7 +274,7 @@ export default function AnalyticsCharts() {
           description="Where your donations have landed."
         >
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer key={resolvedTheme} width="100%" height="100%">
               <BarChart
                 data={byHospital}
                 layout="vertical"
@@ -285,10 +298,13 @@ export default function AnalyticsCharts() {
                   stroke="var(--color-muted-foreground)"
                   fontSize={11}
                 />
-                <Tooltip cursor={{ fill: "var(--color-muted)" }} />
+                <Tooltip
+                  cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
+                  contentStyle={tooltipContentStyle}
+                />
                 <Bar dataKey="units" name="Units" radius={[0, 4, 4, 0]}>
                   {byHospital.map((entry, index) => (
-                    <Rectangle
+                    <Cell
                       key={entry.hospital}
                       fill={CHART_COLORS[index % CHART_COLORS.length]}
                     />
@@ -304,7 +320,7 @@ export default function AnalyticsCharts() {
           description="How your assignments ended up."
         >
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer key={resolvedTheme} width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={statusSplit}
@@ -315,14 +331,14 @@ export default function AnalyticsCharts() {
                   paddingAngle={3}
                 >
                   {statusSplit.map((entry, index) => (
-                    <Rectangle
+                    <Cell
                       key={entry.status}
                       fill={CHART_COLORS[index % CHART_COLORS.length]}
                     />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={24} />
+                <Tooltip contentStyle={tooltipContentStyle} />
+                <Legend position="bottom" height={24} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -333,7 +349,7 @@ export default function AnalyticsCharts() {
           description="The kinds of patients you have supported."
         >
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer key={resolvedTheme} width="100%" height="100%">
               <BarChart
                 data={byBloodGroup}
                 margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
@@ -353,10 +369,13 @@ export default function AnalyticsCharts() {
                   stroke="var(--color-muted-foreground)"
                   fontSize={12}
                 />
-                <Tooltip cursor={{ fill: "var(--color-muted)" }} />
+                <Tooltip
+                  cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
+                  contentStyle={tooltipContentStyle}
+                />
                 <Bar dataKey="requests" name="Donations" radius={[4, 4, 0, 0]}>
                   {byBloodGroup.map((entry, index) => (
-                    <Rectangle
+                    <Cell
                       key={entry.group}
                       fill={CHART_COLORS[index % CHART_COLORS.length]}
                     />
