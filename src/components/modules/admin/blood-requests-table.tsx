@@ -188,24 +188,40 @@ export default function AdminBloodRequestsTable() {
         return (
           <div className="flex justify-end gap-2">
             {allowed.map((status) => (
-              <Button
-                key={status}
-                variant="outline"
-                size="sm"
-                className="cursor-pointer"
-                onClick={() => setPendingStatus({ request, status })}
-              >
-                {status === "VERIFIED" ? "Verify" : "Cancel"}
-              </Button>
+              <span key={status} className="flex gap-2">
+                <Button
+                  key={status}
+                  variant="outline"
+                  size="sm"
+                  className="cursor-pointer"
+                  onClick={() => setPendingStatus({ request, status })}
+                >
+                  {status === "VERIFIED" ? "Verify" : "Cancel"}
+                </Button>
+
+                <Button
+                  key={status}
+                  variant="outline"
+                  size="sm"
+                  className="cursor-pointer"
+                  aria-label={`Open request for ${request.patientName}`}
+                  render={<Link href={`/patient/requests/${request.id}`} />}
+                >
+                  Details
+                </Button>
+              </span>
             ))}
-            <Button
+
+            {/* <Button
               variant="ghost"
               size="icon-sm"
               aria-label={`Open request for ${request.patientName}`}
               render={<Link href={`/patient/requests/${request.id}`} />}
+              
             >
               <ExternalLink className="size-4" />
-            </Button>
+
+            </Button> */}
           </div>
         );
       },

@@ -24,6 +24,15 @@ const ROLE_GUARDS = [
   { prefix: "/donor", role: "DONOR" },
 ];
 
+// Specific routes inside a guarded prefix that other roles may also open
+const SHARED_ROUTES: { pattern: RegExp; roles: string[] }[] = [
+  {
+    // /patient/requests/<id> only (not /patient/requests, not /patient/requests/<id>/edit)
+    pattern: /^\/patient\/requests\/[^/]+\/?$/,
+    roles: ["ADMIN", "DONOR"],
+  },
+];
+
 const isUnder = (pathname: string, prefix: string) =>
   pathname === prefix || pathname.startsWith(`${prefix}/`);
 
@@ -102,7 +111,12 @@ export async function proxy(request: NextRequest) {
       loginUrl.searchParams.set("next", pathname);
       return redirectTo(loginUrl);
     }
-    if (userRole !== guard.role) {
+
+    const isSharedAllowed = SHARED_ROUTES.some(
+      (r) => r.pattern.test(pathname) && r.roles.includes(userRole),
+    );
+
+    if (userRole !== guard.role && !isSharedAllowed) {
       return redirectTo(
         new URL(DASHBOARD_BY_ROLE[userRole] ?? "/login", request.url),
       );
