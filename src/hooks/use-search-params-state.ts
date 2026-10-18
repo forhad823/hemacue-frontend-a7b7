@@ -19,16 +19,20 @@ export function useSearchParamsState<T extends Record<string, ParamValue>>(
     return out as T;
   }, [searchParams, defaults]);
 
+  // Stable identity: reads the CURRENT url at call time instead of closing
+  // over `searchParams`, so consumers' effects don't re-run on every URL change
+  // and back-to-back updates never act on stale params.
   const setValues = useCallback(
     (patch: Partial<T>) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(window.location.search);
       Object.entries(patch).forEach(([k, v]) => {
         if (v === undefined || v === null || v === "") params.delete(k);
         else params.set(k, String(v));
       });
-      router.replace(`${pathname}?${params.toString()}`);
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
-    [router, pathname, searchParams],
+    [router, pathname],
   );
 
   return { values, setValues };
