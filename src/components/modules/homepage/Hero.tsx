@@ -29,6 +29,73 @@ import { formatBloodGroup } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { BloodGroup } from "@/types";
 
+// ─── Config ──────────────────────────────────────────────────────────────────
+
+// false  → animations ALWAYS play, even if the OS has "reduce motion" on.
+// true   → honour the OS setting (recommended for production accessibility):
+//          carousel starts paused and entrance animations are disabled.
+const RESPECT_REDUCED_MOTION = false;
+
+const AUTO_ADVANCE_MS = 4_000;
+const GROUP_SPOTLIGHT_MS = 900;
+const WORD_STAGGER_MS = 120;
+
+// ─── Self-contained animation CSS ────────────────────────────────────────────
+// Defined here so nothing depends on tw-animate-css or on the OS motion
+// setting. Only the "from" state is declared; each animation ends on the
+// element's natural styles. `backwards` fill keeps delayed elements hidden
+// until their turn without overriding later hover/active styles.
+
+const HERO_CSS = `
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(32px); }
+}
+@keyframes hero-word-in {
+  from { opacity: 0; transform: translateY(0.6em) scale(0.96); filter: blur(6px); }
+}
+@keyframes hero-fade-right {
+  from { opacity: 0; transform: translateX(64px); }
+}
+@keyframes hero-pop {
+  from { opacity: 0; transform: scale(0.7) translateY(12px); }
+}
+@keyframes hero-icon-in {
+  from { opacity: 0; transform: scale(0.4) rotate(-25deg); }
+}
+@keyframes hero-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes hero-float-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(40px, 30px, 0) scale(1.12); }
+}
+@keyframes hero-float-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-36px, -28px, 0) scale(1.1); }
+}
+
+.hero-fade-up    { animation: hero-fade-up 800ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.hero-word       { animation: hero-word-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.hero-fade-right { animation: hero-fade-right 1000ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.hero-pop        { animation: hero-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.hero-icon-in    { animation: hero-icon-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.hero-progress   { animation: hero-progress linear forwards; transform-origin: left center; }
+.hero-float-a    { animation: hero-float-a 9s ease-in-out infinite; }
+.hero-float-b    { animation: hero-float-b 11s ease-in-out infinite; }
+
+${
+  RESPECT_REDUCED_MOTION
+    ? `@media (prefers-reduced-motion: reduce) {
+  .hero-fade-up, .hero-word, .hero-fade-right, .hero-pop,
+  .hero-icon-in, .hero-progress, .hero-float-a, .hero-float-b {
+    animation: none !important;
+  }
+}`
+    : ""
+}
+`;
+
 // ─── Slide data ──────────────────────────────────────────────────────────────
 
 const SLIDES = [
@@ -92,8 +159,6 @@ const SLIDES = [
   },
 ] as const;
 
-const AUTO_ADVANCE_MS = 2_000;
-const GROUP_SPOTLIGHT_MS = 800;
 const BLOOD_GROUPS = Object.values(BloodGroup);
 
 const trustPoints = [
@@ -105,21 +170,14 @@ const trustPoints = [
 
 // ─── Auto-advance hook ───────────────────────────────────────────────────────
 //
-// Pause conditions (React state, not refs, so the effect re-runs and the
-// interval is cleared + restarted whenever any of them changes):
+// Pause conditions:
 //   1. Manual pause via the play/pause button.
-//   2. Pointer hovering the carousel CONTROL BAR only — not the whole hero.
-//      (The hero is 65–70 vh, i.e. most of the viewport; pausing on the whole
-//      section meant a mouse parked anywhere over the hero froze the rotation
-//      forever, which is exactly the bug reported. Hovering the controls still
-//      pauses so the timer never ticks away while the user is about to click.)
-//   3. Browser tab hidden (visibilitychange).
-//   4. prefers-reduced-motion — rotation starts paused (a11y default) but the
-//      user can explicitly press play to opt back in.
+//   2. Pointer hovering the carousel control bar only.
+//   3. Browser tab hidden.
+//   4. (Only if RESPECT_REDUCED_MOTION) OS reduced-motion → starts paused.
 //
-// `cycle` increments every time a fresh interval window starts; the progress
-// bar is keyed on it so the visual countdown always restarts in lockstep with
-// the timer (including after pause/resume and manual navigation).
+// `cycle` increments every time a fresh timer window starts; the progress bar
+// is keyed on it so the countdown restarts in lockstep with the timer.
 
 function useAutoAdvance(length: number) {
   const [index, setIndex] = useState(0);
@@ -130,6 +188,8 @@ function useAutoAdvance(length: number) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
+    if (!RESPECT_REDUCED_MOTION) return;
+
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mq.matches);
     if (mq.matches) setIsPaused(true);
@@ -153,12 +213,12 @@ function useAutoAdvance(length: number) {
   useEffect(() => {
     if (!autoPlayActive) return;
 
-    setCycle((c) => c + 1);
-    const t = setInterval(() => {
-      setIndex(() => (index + 1) % length);
+    setCycle((c) => c + 1); // restarts the progress bar in sync
+    const t = setTimeout(() => {
+      setIndex((index + 1) % length);
     }, AUTO_ADVANCE_MS);
 
-    return () => clearInterval(t);
+    return () => clearTimeout(t);
   }, [autoPlayActive, index, length]);
 
   const goTo = useCallback(
@@ -209,8 +269,7 @@ export default function Hero() {
   const touchStartX = useRef(0);
 
   // Blood-group "compatibility engine" spotlight — walks the grid one group at
-  // a time so the card reads like a live matching scan. Disabled entirely under
-  // prefers-reduced-motion (hover highlight still works, without transforms).
+  // a time so the card reads like a live matching scan.
   useEffect(() => {
     if (prefersReducedMotion) return;
 
@@ -226,11 +285,12 @@ export default function Hero() {
   const SecondaryIcon = slide.secondaryCta.icon;
   const IllustrationIcon = slide.illustrationIcon;
   const activeGroup = hoveredGroup ?? spotlightIndex;
-  const headlineWordCount = slide.headline.split(" ").length;
+  const headlineWords = slide.headline.split(" ");
+  const accentDelay = headlineWords.length * WORD_STAGGER_MS + 100;
+  const subheadDelay = accentDelay + 250;
+  const ctaDelay = subheadDelay + 150;
 
-  // WAI-ARIA carousel pattern: each slide is a labelled group. Kept as a
-  // spread object because Biome's useSemanticElements rule suggests replacing a
-  // static role="group" attribute with <fieldset>, which is wrong for slides.
+  // WAI-ARIA carousel pattern: each slide is a labelled group.
   const slideA11yProps = {
     role: "group" as const,
     "aria-roledescription": "slide",
@@ -267,9 +327,9 @@ export default function Hero() {
       aria-label="Hero carousel"
       aria-roledescription="carousel"
     >
-      {/* ── Decorative background blobs ─────────────────────────────────────
-          animate-pulse runs continuously; motion-reduce:animate-none respects
-          the user's OS-level reduced-motion preference. */}
+      <style>{HERO_CSS}</style>
+
+      {/* ── Decorative background blobs (slow drifting motion) ─────────── */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-primary/8 via-background to-background"
@@ -278,41 +338,36 @@ export default function Hero() {
         aria-hidden
         className={cn(
           "pointer-events-none absolute -top-40 left-1/4 -z-10 size-112 rounded-full blur-3xl",
-          "animate-pulse motion-reduce:animate-none",
-          "transition-colors duration-700",
+          "hero-float-a transition-colors duration-700",
           slide.blobColor,
         )}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 top-24 -z-10 size-96 rounded-full bg-rose-200/40 blur-3xl dark:bg-rose-950/40 animate-pulse motion-reduce:animate-none"
+        className="hero-float-b pointer-events-none absolute -right-24 top-24 -z-10 size-96 rounded-full bg-rose-200/40 blur-3xl dark:bg-rose-950/40"
       />
 
       <div className="container mx-auto flex flex-1 flex-col px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         {/* ── Slide layout ──────────────────────────────────────────────────
-            The outer grid has no key/animation — it is stable across slides.
-            Only the text content inside the left column is keyed and animated
-            so the blood-group card on the right never jumps or flickers. */}
+            The outer grid is stable across slides. Only the text blocks in
+            the left column are keyed, so they remount and replay their
+            entrance on every slide change.
+            Cascade: eyebrow → headline words (stagger) → accent phrase →
+            subhead → CTAs. */}
         <div
           {...slideA11yProps}
           className="grid flex-1 items-center gap-12 lg:grid-cols-12"
         >
-          {/* ── Left column — animated text content ───────────────────────
-              Each block carries a key so React fully unmounts and remounts it
-              on every slide change, re-triggering the animate-in entrance.
-              fill-mode-backwards keeps delayed elements invisible until their
-              turn instead of flashing in before the delay elapses.
-              Cascade: eyebrow (0 ms) → headline words (70 ms apart) →
-              accent phrase → subhead (150 ms) → CTAs (200 ms) */}
+          {/* ── Left column — animated text content ─────────────────────── */}
           <div className="flex flex-col items-start lg:col-span-7">
             {/* Eyebrow badge — live emergency pulse */}
             <Badge
               key={`eyebrow-${index}`}
               variant="outline"
-              className="gap-2 border-primary/25 bg-background/80 px-3 py-1 text-xs font-medium text-primary backdrop-blur animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards duration-500 motion-reduce:animate-none"
+              className="hero-fade-up gap-2 border-primary/25 bg-background/80 px-3 py-1 text-xs font-medium text-primary backdrop-blur"
             >
               <span aria-hidden className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75 motion-reduce:animate-none" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-primary" />
               </span>
               {slide.eyebrow}
@@ -323,11 +378,11 @@ export default function Hero() {
               key={`headline-${index}`}
               className="mt-6 text-balance text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
             >
-              {slide.headline.split(" ").map((word, i) => (
-                <Fragment key={word}>
+              {headlineWords.map((word, i) => (
+                <Fragment key={`${word}-${String(i)}`}>
                   <span
-                    className="inline-block animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards motion-reduce:animate-none"
-                    style={{ animationDelay: `${i * 70}ms` }}
+                    className="hero-word inline-block"
+                    style={{ animationDelay: `${150 + i * WORD_STAGGER_MS}ms` }}
                   >
                     {word}
                   </span>{" "}
@@ -336,11 +391,11 @@ export default function Hero() {
               <span
                 key={`headline-accent-${index}`}
                 className={cn(
-                  "bg-linear-to-r bg-clip-text text-transparent animate-in fade-in fill-mode-backwards motion-reduce:animate-none",
+                  "hero-word inline-block bg-linear-to-r bg-clip-text text-transparent",
                   slide.accentFrom,
                   slide.accentTo,
                 )}
-                style={{ animationDelay: `${headlineWordCount * 70}ms` }}
+                style={{ animationDelay: `${accentDelay}ms` }}
               >
                 {slide.headlineAccent}
               </span>
@@ -349,7 +404,8 @@ export default function Hero() {
             {/* Subhead */}
             <p
               key={`subhead-${index}`}
-              className="mt-6 max-w-xl text-balance text-base text-muted-foreground sm:text-lg animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards duration-500 delay-150 motion-reduce:animate-none"
+              className="hero-fade-up mt-6 max-w-xl text-balance text-base text-muted-foreground sm:text-lg"
+              style={{ animationDelay: `${subheadDelay}ms` }}
             >
               {slide.subhead}
             </p>
@@ -357,11 +413,12 @@ export default function Hero() {
             {/* CTA row */}
             <div
               key={`ctas-${index}`}
-              className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards duration-500 delay-200 motion-reduce:animate-none"
+              className="hero-fade-up mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row"
+              style={{ animationDelay: `${ctaDelay}ms` }}
             >
               <Button
                 size="lg"
-                className="w-full gap-2 shadow-md shadow-primary/20 transition-transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none sm:w-auto"
+                className="w-full gap-2 shadow-md shadow-primary/20 transition-transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] sm:w-auto"
                 render={<Link href={slide.primaryCta.href} />}
               >
                 <PrimaryIcon className="size-4" />
@@ -370,7 +427,7 @@ export default function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full gap-2 transition-transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none sm:w-auto"
+                className="w-full gap-2 transition-transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98] sm:w-auto"
                 render={<Link href={slide.secondaryCta.href} />}
               >
                 <SecondaryIcon className="size-4" />
@@ -395,12 +452,12 @@ export default function Hero() {
 
           {/* ── Right column — blood group card (static, never re-keyed) ── */}
           <div className="lg:col-span-5">
-            <div className="animate-in fade-in slide-in-from-right-8 fill-mode-backwards duration-700 motion-reduce:animate-none rounded-2xl border border-border/60 bg-card/70 p-6 shadow-xl shadow-red-500/5 backdrop-blur-sm">
+            <div className="hero-fade-right rounded-2xl border border-border/60 bg-card/70 p-6 shadow-xl shadow-red-500/5 backdrop-blur-sm">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span
                     key={`card-icon-${index}`}
-                    className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary animate-in fade-in zoom-in-95 fill-mode-backwards duration-300 motion-reduce:animate-none"
+                    className="hero-icon-in flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"
                   >
                     <IllustrationIcon className="size-5" />
                   </span>
@@ -430,18 +487,17 @@ export default function Hero() {
                     <li
                       key={group}
                       onMouseEnter={() => setHoveredGroup(i)}
-                      style={{ animationDelay: `${300 + i * 60}ms` }}
+                      style={{ animationDelay: `${500 + i * 90}ms` }}
                       className={cn(
-                        "flex flex-col items-center gap-1 rounded-xl border py-3 transition-all duration-300",
-                        "animate-in fade-in zoom-in-95 fill-mode-backwards motion-reduce:animate-none",
+                        "hero-pop flex flex-col items-center gap-1 rounded-xl border py-3 transition-all duration-500",
                         isActive
-                          ? "scale-105 border-primary/60 bg-primary/10 text-primary shadow-lg shadow-primary/10 motion-reduce:scale-100"
+                          ? "scale-110 border-primary/60 bg-primary/10 text-primary shadow-lg shadow-primary/20"
                           : "border-border/60 bg-background/80 hover:border-primary/40",
                       )}
                     >
                       <Droplet
                         className={cn(
-                          "size-4 transition-all duration-300",
+                          "size-4 transition-all duration-500",
                           isActive
                             ? "fill-primary text-primary"
                             : "fill-primary/40 text-primary/60",
@@ -480,22 +536,22 @@ export default function Hero() {
 
         {/* ── Countdown progress + carousel controls ───────────────────────── */}
         <div className="mt-10">
-          {/* Auto-advance countdown — restarts in lockstep with the timer via
-              the `cycle` key; freezes (play-state: paused) whenever rotation is
-              paused. Slide accent colours keep it tied to the current story. */}
+          {/* Auto-advance countdown — remounts on every timer restart via the
+              `cycle` key, and freezes while rotation is paused. */}
           <div
             aria-hidden
-            className="h-1 w-full overflow-hidden rounded-full bg-muted/70 motion-reduce:hidden"
+            className="h-1 w-full overflow-hidden rounded-full bg-muted/70"
           >
             <div
-              key={`${index}-${cycle}`}
-              style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+              key={cycle}
+              style={{
+                animationDuration: `${AUTO_ADVANCE_MS}ms`,
+                animationPlayState: autoPlayActive ? "running" : "paused",
+              }}
               className={cn(
-                "h-full w-full rounded-full bg-linear-to-r",
+                "hero-progress h-full w-full rounded-full bg-linear-to-r",
                 slide.accentFrom,
                 slide.accentTo,
-                "animate-in slide-in-from-left-full ease-linear fill-mode-forwards",
-                !autoPlayActive && "paused",
               )}
             />
           </div>
@@ -516,7 +572,7 @@ export default function Hero() {
               <Button
                 size="icon"
                 variant="outline"
-                className="size-9 transition-transform hover:scale-105 motion-reduce:transform-none"
+                className="size-9 transition-transform hover:scale-105"
                 onClick={prev}
                 aria-label="Previous slide"
               >
@@ -525,7 +581,7 @@ export default function Hero() {
               <Button
                 size="icon"
                 variant="outline"
-                className="size-9 transition-transform hover:scale-105 motion-reduce:transform-none"
+                className="size-9 transition-transform hover:scale-105"
                 onClick={togglePause}
                 aria-label={
                   isPaused
@@ -543,7 +599,7 @@ export default function Hero() {
               <Button
                 size="icon"
                 variant="outline"
-                className="size-9 transition-transform hover:scale-105 motion-reduce:transform-none"
+                className="size-9 transition-transform hover:scale-105"
                 onClick={next}
                 aria-label="Next slide"
               >
@@ -566,7 +622,7 @@ export default function Hero() {
                   aria-label={`Go to slide ${i + 1}`}
                   onClick={() => goTo(i)}
                   className={cn(
-                    "size-2 rounded-full transition-all duration-300 hover:scale-125 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none",
+                    "size-2 rounded-full transition-all duration-500 hover:scale-125 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     i === index
                       ? "bg-primary w-6"
                       : "bg-muted-foreground/30 hover:bg-muted-foreground/60",
