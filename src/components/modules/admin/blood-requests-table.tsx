@@ -1,8 +1,8 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -28,8 +28,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useBloodRequests, useUpdateRequestStatus } from "@/hooks";
-import { useTableState } from "@/hooks/use-table-state";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useTableState } from "@/hooks/use-table-state";
 import {
   BLOOD_GROUP_OPTIONS,
   DISTRICTS,
@@ -60,7 +60,14 @@ export default function AdminBloodRequestsTable() {
     setSearch,
     setFilter,
   } = useTableState({
-    sortFields: ["patientName", "neededBy", "bloodGroup", "urgency", "status", "createdAt"],
+    sortFields: [
+      "patientName",
+      "neededBy",
+      "bloodGroup",
+      "urgency",
+      "status",
+      "createdAt",
+    ],
     defaultSort: { field: "createdAt", order: "desc" },
     filterKeys: ["status", "bloodGroup", "district", "urgency"],
     pageSize: PAGE_SIZE,
@@ -79,10 +86,16 @@ export default function AdminBloodRequestsTable() {
       page,
       limit: PAGE_SIZE,
       searchTerm: debouncedSearch || undefined,
-      sortBy: sort.field as "createdAt" | "neededBy" | "patientName" | "bloodGroup" | "urgency",
+      sortBy: sort.field as
+        | "createdAt"
+        | "neededBy"
+        | "patientName"
+        | "bloodGroup"
+        | "urgency",
       sortOrder: sort.order,
       status: (filters.status || undefined) as RequestStatus | undefined,
-      bloodGroup: (filters.bloodGroup || undefined) as BloodRequest["bloodGroup"],
+      bloodGroup: (filters.bloodGroup ||
+        undefined) as BloodRequest["bloodGroup"],
       district: filters.district || undefined,
       urgency: (filters.urgency || undefined) as BloodRequest["urgency"],
     }),
@@ -103,8 +116,7 @@ export default function AdminBloodRequestsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (p: number) =>
-    setPage(Math.min(Math.max(p, 1), totalPages));
+  const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
   const confirmStatusChange = () => {
     if (!pendingStatus) return;

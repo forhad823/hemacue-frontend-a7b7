@@ -1,8 +1,8 @@
 import {
+  CreditCard,
+  FileText,
   LayoutDashboard,
   PlusCircle,
-  FileText,
-  CreditCard,
   User,
 } from "lucide-react";
 import type { SidebarGroup } from "@/types";

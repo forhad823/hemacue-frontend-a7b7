@@ -1,8 +1,8 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { publicApi } from "@/api/public.api";
-import { PageHero } from "@/components/shared/page-hero";
 import { ExploreClient } from "@/components/modules/explore/explore-client";
+import { PageHero } from "@/components/shared/page-hero";
 
 export const metadata: Metadata = {
   title: "Explore Blood Requests | Hemacue",

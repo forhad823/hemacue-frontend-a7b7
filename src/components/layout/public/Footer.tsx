@@ -1,12 +1,12 @@
+import { Heart, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { Heart, Mail, Phone, MapPin } from "lucide-react";
 
 import {
   FaFacebook,
-  FaXTwitter,
+  FaGithub,
   FaInstagram,
   FaLinkedin,
-  FaGithub,
+  FaXTwitter,
 } from "react-icons/fa6";
 import { HemacueLogo } from "@/components/shared/hemacue-logo";
 import { CONTACT_INFO, PUBLIC_NAV_LINKS } from "@/lib/constants";

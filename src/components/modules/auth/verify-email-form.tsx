@@ -1,28 +1,28 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useVerifyAccount, useResendRegisterOtp, useCountdown } from "@/hooks";
-import { verifyEmailSchema } from "@/validation";
+import { Mail, RefreshCw } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { userApi } from "@/api";
-import { queryKeys } from "@/lib/query-keys";
-import { setRoleCookie } from "@/lib/session-client";
-import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
-import { Mail, RefreshCw } from "lucide-react";
+import { toast } from "@/components/ui/toast";
+import { useCountdown, useResendRegisterOtp, useVerifyAccount } from "@/hooks";
+import { queryKeys } from "@/lib/query-keys";
+import { setRoleCookie } from "@/lib/session-client";
+import { verifyEmailSchema } from "@/validation";
 
 export default function VerifyEmailForm() {
   const router = useRouter();

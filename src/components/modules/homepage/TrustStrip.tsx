@@ -1,9 +1,4 @@
-import {
-  BadgeCheck,
-  ClipboardList,
-  Clock,
-  ShieldCheck,
-} from "lucide-react";
+import { BadgeCheck, ClipboardList, Clock, ShieldCheck } from "lucide-react";
 
 const TRUST_BADGES = [
   {

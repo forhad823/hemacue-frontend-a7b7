@@ -3,9 +3,9 @@
 import { Droplets, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { FilterSelect } from "@/components/shared/filter-select";
 import { ListingCard } from "@/components/shared/listing-card";
 import { ListingGrid } from "@/components/shared/listing-grid";
-import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
 import { SearchInput } from "@/components/shared/search-input";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
@@ -22,7 +22,13 @@ import {
   URGENCY_OPTIONS,
 } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
-import type { ApiResponse, BloodGroup, BloodRequest, RequestStatus, UrgencyLevel } from "@/types";
+import type {
+  ApiResponse,
+  BloodGroup,
+  BloodRequest,
+  RequestStatus,
+  UrgencyLevel,
+} from "@/types";
 
 const PAGE_SIZE = 9;
 
@@ -56,7 +62,11 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
       page,
       limit: PAGE_SIZE,
       searchTerm: debouncedSearch || undefined,
-      sortBy: sort.field as "createdAt" | "neededBy" | "patientName" | "urgency",
+      sortBy: sort.field as
+        | "createdAt"
+        | "neededBy"
+        | "patientName"
+        | "urgency",
       sortOrder: sort.order,
       status: (filters.status || undefined) as RequestStatus | undefined,
       bloodGroup: (filters.bloodGroup || undefined) as BloodGroup | undefined,

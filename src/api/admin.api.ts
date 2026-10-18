@@ -1,5 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import type {
+  AdminPayment,
+  AdminPaymentsQueryParams,
   AdminUser,
   AdminUsersQueryParams,
   ApiResponse,
@@ -12,6 +14,12 @@ import type {
 export const adminApi = {
   users: (p: AdminUsersQueryParams = {}) =>
     apiClient<ApiResponse<AdminUser[]>>("/admin/users", {
+      method: "GET",
+      query: p,
+    }),
+
+  payments: (p: AdminPaymentsQueryParams = {}) =>
+    apiClient<ApiResponse<AdminPayment[]>>("/admin/payments", {
       method: "GET",
       query: p,
     }),

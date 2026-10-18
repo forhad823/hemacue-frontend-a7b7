@@ -98,6 +98,17 @@ export const PAYMENT_PRICING = {
   EMERGENCY_LOGISTICS: 500,
 } as const;
 
+/**
+ * Mirrors `hemacue-backend/src/app/middlewares/rateLimiter.ts` — the real
+ * Redis-backed limiter values enforced per client IP.
+ */
+export const RATE_LIMITS = {
+  /** Every `/api/v1` route. */
+  global: { maxRequests: 100, windowMinutes: 15 },
+  /** Auth + payment initiation/execution routes. */
+  authPayment: { maxRequests: 30, windowMinutes: 15 },
+} as const;
+
 export const BLOOD_GROUP_OPTIONS = [
   { value: "A_POSITIVE", label: "A+" },
   { value: "A_NEGATIVE", label: "A-" },
@@ -140,6 +151,19 @@ export const USER_ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin" },
   { value: "PATIENT", label: "Patient" },
   { value: "DONOR", label: "Donor" },
+] as const;
+
+/** Shared by every payment table filter (patient history, admin payments). */
+export const PAYMENT_STATUS_OPTIONS = [
+  { value: "INITIALIZED", label: "Initialized" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "FAILED", label: "Failed" },
+  { value: "CANCELLED", label: "Cancelled" },
+] as const;
+
+export const PAYMENT_TYPE_OPTIONS = [
+  { value: "PREMIUM_NOTIFICATION", label: "Premium Notification" },
+  { value: "EMERGENCY_LOGISTICS", label: "Emergency Logistics" },
 ] as const;
 
 export const AUDIT_ACTION_OPTIONS = [

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import HeaderAuthActions from "./HeaderAuthActions";
 import HeaderNav from "./HeaderNav";

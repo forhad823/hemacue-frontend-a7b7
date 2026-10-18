@@ -1,7 +1,10 @@
 import { FilePlus2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import { ChartSkeleton } from "@/components/dashboard/skeletons";
 import MyRequestsTable from "@/components/modules/blood-requests/my-requests-table";
+import PatientRequestsOverview from "@/components/modules/blood-requests/patient-requests-overview";
 import { PageHeading } from "@/components/shared/page-heading";
 import { Button } from "@/components/ui/button";
 
@@ -27,7 +30,19 @@ export default function PatientRequestsPage() {
           New request
         </Button>
       </PageHeading>
-      <MyRequestsTable />
+      <div className="space-y-6">
+        <Suspense
+          fallback={
+            <div className="grid gap-6 lg:grid-cols-2">
+              <ChartSkeleton />
+              <ChartSkeleton />
+            </div>
+          }
+        >
+          <PatientRequestsOverview />
+        </Suspense>
+        <MyRequestsTable />
+      </div>
     </div>
   );
 }

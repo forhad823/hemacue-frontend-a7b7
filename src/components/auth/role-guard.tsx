@@ -1,10 +1,10 @@
 "use client";
-import { useGetMe } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
-import AuthLoading from "./auth-loading";
-import AccessDenied from "./access-denied";
+import { useGetMe } from "@/hooks";
 import type { UserRole } from "@/types";
+import AccessDenied from "./access-denied";
+import AuthLoading from "./auth-loading";
 
 interface Props {
   children: ReactNode;

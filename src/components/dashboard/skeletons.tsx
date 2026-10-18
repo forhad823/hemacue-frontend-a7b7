@@ -1,4 +1,9 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /** Grid of stat-card placeholders used by every dashboard overview loading state. */
@@ -86,7 +91,6 @@ export function DetailSkeleton() {
     </div>
   );
 }
-
 
 /**
  * Responsive card-grid placeholder used by FeaturedRequests (home page),

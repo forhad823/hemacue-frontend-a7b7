@@ -17,8 +17,8 @@ import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
 import { useMyBloodRequests } from "@/hooks";
-import { useTableState } from "@/hooks/use-table-state";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useTableState } from "@/hooks/use-table-state";
 import { REQUEST_STATUS_OPTIONS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import type { BloodRequest, RequestStatus } from "@/types";
@@ -61,8 +61,7 @@ export default function MyRequestsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (p: number) =>
-    setPage(Math.min(Math.max(p, 1), totalPages));
+  const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
   const columns: Column<BloodRequest>[] = [
     {

@@ -10,8 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStats } from "@/hooks";
-import { humanizeToken } from "@/lib/format";
-import type { RequestStatus, UserRole } from "@/types";
+import { buildStatusBars, buildUserSlices } from "@/lib/dashboard-chart-data";
 
 /** Recharts is ~100 kB gzipped — keep it out of the initial dashboard bundle. */
 const UsersChart = dynamic(() => import("./users-chart"), {
@@ -23,16 +22,6 @@ const RequestsChart = dynamic(() => import("./requests-chart"), {
   ssr: false,
   loading: () => <ChartSkeleton />,
 });
-
-const ROLE_ORDER: UserRole[] = ["PATIENT", "DONOR", "ADMIN"];
-const STATUS_ORDER: RequestStatus[] = [
-  "PENDING",
-  "VERIFIED",
-  "DONOR_ASSIGNED",
-  "IN_PROGRESS",
-  "COMPLETED",
-  "CANCELLED",
-];
 
 const cardAccents = [
   "bg-sky-500/10 text-sky-600 dark:text-sky-400",
@@ -70,15 +59,8 @@ export default function AdminOverview() {
     );
   }
 
-  const userSlices = ROLE_ORDER.map((role) => ({
-    name: humanizeToken(role),
-    value: stats.usersByRole[role] ?? 0,
-  })).filter((slice) => slice.value > 0);
-
-  const statusBars = STATUS_ORDER.map((status) => ({
-    name: humanizeToken(status),
-    value: stats.bloodRequestsByStatus[status] ?? 0,
-  })).filter((bar) => bar.value > 0);
+  const userSlices = buildUserSlices(stats);
+  const statusBars = buildStatusBars(stats);
 
   return (
     <div className="space-y-6">

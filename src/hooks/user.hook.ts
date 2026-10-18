@@ -1,8 +1,8 @@
 "use client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "@/api";
 import { queryKeys } from "@/lib/query-keys";
 import type { UpdateProfilePayload } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useGetMe() {
   return useQuery({

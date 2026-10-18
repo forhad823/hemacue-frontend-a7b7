@@ -70,8 +70,7 @@ export function useTableState(config: UseTableStateConfig) {
   );
 
   const setSearch = useCallback(
-    (searchTerm: string) =>
-      setValues({ searchTerm, page: "1" } as never),
+    (searchTerm: string) => setValues({ searchTerm, page: "1" } as never),
     [setValues],
   );
 

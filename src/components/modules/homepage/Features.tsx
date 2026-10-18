@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   Check,
@@ -6,9 +5,10 @@ import {
   HeartHandshake,
   Truck,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
   {

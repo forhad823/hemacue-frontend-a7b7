@@ -1,10 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   ACCESS_COOKIE,
   ACCESS_MAX_AGE,
+  baseCookieOptions,
   REFRESH_COOKIE,
   REFRESH_MAX_AGE,
-  baseCookieOptions,
 } from "@/lib/auth-cookies";
 import { getNewTokens } from "@/service/refreshToken";
 import type { AuthTokens } from "@/types";

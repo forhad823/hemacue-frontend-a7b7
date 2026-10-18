@@ -17,7 +17,7 @@ const executePaymentSchema = z.object({
 });
 
 const refundPaymentParamsSchema = z.object({
-	requestId: z.string().uuid("Invalid request id format"),
+	requestId: z.uuid("Invalid request id format"),
 });
 
 const refundPaymentSchema = z.object({

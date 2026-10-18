@@ -1,6 +1,6 @@
 import { Quote } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { Card, CardContent } from "@/components/ui/card";
 import { TESTIMONIALS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,10 @@ export default function Testimonials() {
               <Card className="h-full">
                 <CardContent className="flex h-full flex-col gap-4 pt-6">
                   {/* Opening quote icon */}
-                  <Quote className="size-6 shrink-0 text-primary/40" aria-hidden />
+                  <Quote
+                    className="size-6 shrink-0 text-primary/40"
+                    aria-hidden
+                  />
 
                   {/* Quote body */}
                   <blockquote className="flex-1 text-sm leading-relaxed text-muted-foreground">
@@ -101,7 +104,10 @@ export function TestimonialsSkeleton() {
               <div className="size-6 rounded bg-muted animate-pulse" />
               <div className="space-y-2">
                 {[1, 2, 3, 4].map((l) => (
-                  <div key={l} className="h-3 w-full rounded bg-muted animate-pulse" />
+                  <div
+                    key={l}
+                    className="h-3 w-full rounded bg-muted animate-pulse"
+                  />
                 ))}
                 <div className="h-3 w-3/4 rounded bg-muted animate-pulse" />
               </div>

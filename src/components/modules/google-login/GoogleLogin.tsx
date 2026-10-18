@@ -1,13 +1,13 @@
 "use client";
 
+import { GoogleLogin } from "@react-oauth/google";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
 import { userApi } from "@/api";
 import { toast } from "@/components/ui/toast";
 import { useGoogleOAuth } from "@/hooks";
 import { queryKeys } from "@/lib/query-keys";
 import { setRoleCookie } from "@/lib/session-client";
-import { GoogleLogin } from "@react-oauth/google";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
 
 export default function GoogleLoginComponent() {
   const router = useRouter();

@@ -1,28 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import {
+  Building,
+  Droplet,
   Eye,
   EyeOff,
+  Home,
   Lock,
   Mail,
+  MapPin,
   Phone,
   User as UserIcon,
-  MapPin,
-  Building,
-  Home,
-  Droplet,
 } from "lucide-react";
-import { registerSchema } from "@/validation";
-import { useRegistration } from "@/hooks";
-import { BloodGroup } from "@/types";
-import { formatBloodGroup } from "@/lib/format";
-import { toast } from "@/components/ui/toast";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Field,
   FieldError,
@@ -30,7 +24,13 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
+import { useRegistration } from "@/hooks";
+import { formatBloodGroup } from "@/lib/format";
+import { BloodGroup } from "@/types";
+import { registerSchema } from "@/validation";
 import GoogleLoginComponent from "../google-login/GoogleLogin";
 
 export default function RegisterForm() {

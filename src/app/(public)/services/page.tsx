@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-import Link from "next/link";
 import {
   ArrowRight,
   BellRing,
@@ -9,11 +7,13 @@ import {
   Truck,
   Wallet,
 } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { CtaSection } from "@/components/shared/cta-section";
 import { PageHero } from "@/components/shared/page-hero";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Services",

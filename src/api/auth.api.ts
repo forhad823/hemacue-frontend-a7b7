@@ -1,5 +1,6 @@
 import apiClient from "@/lib/apiClient";
 import type {
+  ApiResponse,
   AuthTokens,
   ForgotPasswordPayload,
   GoogleLoginPayload,
@@ -10,7 +11,6 @@ import type {
   UserProfile,
   VerifyEmailPayload,
 } from "@/types";
-import type { ApiResponse } from "@/types";
 
 export const authApi = {
   register: (p: RegisterPayload) =>
@@ -26,7 +26,7 @@ export const authApi = {
     apiClient<ApiResponse<null>>("/auth/verify-email/resend-otp", {
       method: "POST",
       body: p,
-    }), 
+    }),
 
   login: (p: LoginPayload) =>
     apiClient<ApiResponse<AuthTokens>>("/auth/login", {

@@ -1,15 +1,15 @@
+import { ArrowRight, CircleCheck, Eye, Scale, Target, X } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CircleCheck, Eye, Scale, Target, X } from "lucide-react";
-import { CtaSection } from "@/components/shared/cta-section";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PageHero } from "@/components/shared/page-hero";
-import { SectionHeading } from "@/components/shared/section-heading";
+import { Suspense } from "react";
 import LiveStats, {
   LiveStatsSkeleton,
 } from "@/components/modules/homepage/LiveStats";
-import { Suspense } from "react";
+import { CtaSection } from "@/components/shared/cta-section";
+import { PageHero } from "@/components/shared/page-hero";
+import { SectionHeading } from "@/components/shared/section-heading";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "About",

@@ -1,21 +1,21 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useRouter } from "next/navigation";
+import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
-import { Mail, ArrowLeft } from "lucide-react";
-import { forgotPasswordSchema } from "@/validation";
-import { useForgotPassword } from "@/hooks";
-import { toast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
+import { useForgotPassword } from "@/hooks";
+import { forgotPasswordSchema } from "@/validation";
 
 export default function ForgotPasswordForm() {
   const router = useRouter();

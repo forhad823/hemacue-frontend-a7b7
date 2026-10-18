@@ -1,4 +1,4 @@
-import { HeartPulse, Droplets, BarChart3, User } from "lucide-react";
+import { BarChart3, Droplets, HeartPulse, User } from "lucide-react";
 import type { SidebarGroup } from "@/types";
 
 export const donorRoutes: SidebarGroup[] = [

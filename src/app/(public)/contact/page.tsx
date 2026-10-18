@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import { Clock, Mail, MapPin, Navigation, Phone } from "lucide-react";
-import { PageHero } from "@/components/shared/page-hero";
+import type { Metadata } from "next";
 import ContactForm from "@/components/modules/contact/ContactForm";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageHero } from "@/components/shared/page-hero";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { CONTACT_INFO } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -78,7 +78,7 @@ export default function ContactPage() {
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {label}
                       </p>
-                      <p className="break-words text-sm font-semibold text-foreground">
+                      <p className="wrap-break-word text-sm font-semibold text-foreground">
                         {href ? (
                           <a
                             href={href}
@@ -107,7 +107,7 @@ export default function ContactPage() {
           <Card className="overflow-hidden">
             <CardContent className="flex flex-col gap-3">
               <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-xl border border-dashed border-primary/30 bg-primary/5">
-                <div className="absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_center,var(--primary)_1px,transparent_1px)] [background-size:18px_18px]" />
+                <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,var(--primary)_1px,transparent_1px)] bg-size-[18px_18px]" />
                 <div className="relative flex max-w-[16rem] flex-col items-center gap-2 text-center">
                   <MapPin className="size-6 text-primary" />
                   <p className="text-xs font-medium text-foreground">

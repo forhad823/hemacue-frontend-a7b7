@@ -42,7 +42,8 @@ export default function PartnerHospitals() {
       </ul>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        Partner list reflects hospitals where verified Hemacue requests have originated or been fulfilled.
+        Partner list reflects hospitals where verified Hemacue requests have
+        originated or been fulfilled.
       </p>
     </section>
   );

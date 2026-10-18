@@ -1,4 +1,9 @@
-import type { ApiResponse, BloodRequest, BloodRequestQueryParams, PublicLiveStats } from "@/types";
+import type {
+  ApiResponse,
+  BloodRequest,
+  BloodRequestQueryParams,
+  PublicLiveStats,
+} from "@/types";
 import { RequestStatus, UrgencyLevel } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -64,7 +69,11 @@ export const publicApi = {
   ): Promise<ApiResponse<BloodRequest[]> | null> => {
     const params: Record<string, string> = {};
     for (const [k, v] of Object.entries(query)) {
-      if (v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0)) {
+      if (
+        v !== undefined &&
+        v !== "" &&
+        !(Array.isArray(v) && v.length === 0)
+      ) {
         params[k] = Array.isArray(v) ? v.join(",") : String(v);
       }
     }

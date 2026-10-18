@@ -1,7 +1,7 @@
 "use client";
 
 import { CreditCard, Receipt } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -18,26 +18,15 @@ import {
   RequestStatusBadge,
 } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
 import { useMyPayments } from "@/hooks";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { PAYMENT_STATUS_OPTIONS, PAYMENT_TYPE_OPTIONS } from "@/lib/constants";
 import { formatCurrency, formatDateTime, humanizeToken } from "@/lib/format";
 import type { PaymentStatus, PaymentType, PaymentWithRequest } from "@/types";
 
 const PAGE_SIZE = 10;
-
-const PAYMENT_STATUS_OPTIONS = [
-  { value: "INITIALIZED", label: "Initialized" },
-  { value: "COMPLETED", label: "Completed" },
-  { value: "FAILED", label: "Failed" },
-  { value: "CANCELLED", label: "Cancelled" },
-] as const;
-
-const PAYMENT_TYPE_OPTIONS = [
-  { value: "PREMIUM_NOTIFICATION", label: "Premium Notification" },
-  { value: "EMERGENCY_LOGISTICS", label: "Emergency Logistics" },
-] as const;
 
 export default function PaymentHistoryTable() {
   const {
@@ -57,7 +46,7 @@ export default function PaymentHistoryTable() {
   });
 
   const debouncedSearch = useDebounce(searchTerm, 400);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { copiedValue, copy } = useCopyToClipboard();
 
   const params = useMemo(
     () => ({
@@ -95,24 +84,6 @@ export default function PaymentHistoryTable() {
 
   const goToPage = (nextPage: number) =>
     setPage(Math.min(Math.max(nextPage, 1), totalPages));
-
-  const copyId = async (paymentID: string) => {
-    try {
-      await navigator.clipboard.writeText(paymentID);
-      setCopiedId(paymentID);
-      toast.add({
-        title: "Copied",
-        description: `bKash payment ID ${paymentID} copied to your clipboard.`,
-        type: "info",
-      });
-    } catch {
-      toast.add({
-        title: "Copy failed",
-        description: "Your browser blocked clipboard access.",
-        type: "error",
-      });
-    }
-  };
 
   const columns: Column<PaymentWithRequest>[] = [
     {
@@ -165,9 +136,7 @@ export default function PaymentHistoryTable() {
     {
       id: "requestStatus",
       header: "Request status",
-      cell: (payment) => (
-        <RequestStatusBadge status={payment.request.status} />
-      ),
+      cell: (payment) => <RequestStatusBadge status={payment.request.status} />,
     },
     {
       id: "trx",
@@ -208,9 +177,14 @@ export default function PaymentHistoryTable() {
           variant="ghost"
           size="sm"
           className="cursor-pointer"
-          onClick={() => copyId(payment.paymentID)}
+          onClick={() =>
+            copy(
+              payment.paymentID,
+              `bKash payment ID ${payment.paymentID} copied to your clipboard.`,
+            )
+          }
         >
-          {copiedId === payment.paymentID ? "Copied" : "Copy ID"}
+          {copiedValue === payment.paymentID ? "Copied" : "Copy ID"}
         </Button>
       ),
     },

@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import {
   ACCESS_COOKIE,
   ACCESS_MAX_AGE,
+  baseCookieOptions,
   REFRESH_COOKIE,
   REFRESH_MAX_AGE,
-  baseCookieOptions,
 } from "@/lib/auth-cookies";
 import { jwtUtils } from "@/utils/jwt";
 

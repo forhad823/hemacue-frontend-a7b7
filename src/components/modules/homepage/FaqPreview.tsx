@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { SectionHeading } from "@/components/shared/section-heading";
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +10,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/shared/section-heading";
 import { HOME_FAQ_ENTRIES } from "@/lib/constants";
 
 /**
@@ -41,7 +41,11 @@ export default function FaqPreview() {
         </div>
 
         <div className="mt-8 max-w-3xl">
-          <Accordion type="single" collapsible defaultValue={HOME_FAQ_ENTRIES[0].id}>
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue={HOME_FAQ_ENTRIES[0].id}
+          >
             {HOME_FAQ_ENTRIES.map((entry) => (
               <AccordionItem key={entry.id} value={entry.id}>
                 <AccordionTrigger className="text-sm font-medium text-foreground">

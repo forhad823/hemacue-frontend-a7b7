@@ -1,4 +1,5 @@
 import type {
+  AdminPaymentsQueryParams,
   AdminUsersQueryParams,
   AuditLogsQueryParams,
   BloodRequestQueryParams,
@@ -30,6 +31,8 @@ export const queryKeys = {
   },
   admin: {
     users: (p?: AdminUsersQueryParams) => ["admin", "users", p] as const,
+    payments: (p?: AdminPaymentsQueryParams) =>
+      ["admin", "payments", p] as const,
     stats: ["admin", "stats"] as const,
     auditLogs: (p?: AuditLogsQueryParams) =>
       ["admin", "audit-logs", p] as const,

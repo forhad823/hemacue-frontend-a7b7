@@ -1,10 +1,9 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { CtaSection } from "@/components/shared/cta-section";
+import { Suspense } from "react";
 import { ListingGridSkeleton } from "@/components/dashboard/skeletons";
-import Features from "@/components/modules/homepage/Features";
 import FaqPreview from "@/components/modules/homepage/FaqPreview";
 import FeaturedRequests from "@/components/modules/homepage/FeaturedRequests";
+import Features from "@/components/modules/homepage/Features";
 import Hero from "@/components/modules/homepage/Hero";
 import HowItWorks from "@/components/modules/homepage/HowItWorks";
 import LiveStats, {
@@ -17,6 +16,7 @@ import Testimonials, {
 import TrustStrip, {
   TrustStripSkeleton,
 } from "@/components/modules/homepage/TrustStrip";
+import { CtaSection } from "@/components/shared/cta-section";
 
 export const metadata: Metadata = {
   title: "Home",

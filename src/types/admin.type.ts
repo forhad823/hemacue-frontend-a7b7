@@ -1,9 +1,12 @@
 import type {
   BloodGroup,
+  PaymentStatus,
+  PaymentType,
   RequestStatus,
   UserRole,
   UserStatus,
 } from "./enums.type";
+import type { Payment } from "./payment.type";
 
 export interface AdminUser {
   id: string;
@@ -36,6 +39,39 @@ export interface AdminUsersQueryParams {
   district?: string;
   searchTerm?: string;
 }
+
+export interface AdminPaymentsQueryParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "createdAt" | "amount";
+  sortOrder?: "asc" | "desc";
+  status?: PaymentStatus;
+  paymentType?: PaymentType;
+  /** Matches paymentID, trxID, or the payer's email. */
+  searchTerm?: string;
+}
+
+/** Payer summary embedded in `GET /admin/payments` rows. */
+export interface AdminPaymentUser {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+}
+
+/** Blood-request summary embedded in `GET /admin/payments` rows. */
+export interface AdminPaymentRequest {
+  id: string;
+  patientName: string;
+  bloodGroup: BloodGroup;
+  hospitalName: string;
+  status: RequestStatus;
+}
+
+export type AdminPayment = Payment & {
+  user: AdminPaymentUser;
+  request: AdminPaymentRequest;
+};
 
 export interface UpdateUserRolePayload {
   role?: UserRole;

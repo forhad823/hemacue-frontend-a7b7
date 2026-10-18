@@ -62,14 +62,7 @@ function describeDetails(details: Record<string, unknown> | null): string {
 }
 
 export default function AuditLogsTable() {
-  const {
-    page,
-    sort,
-    filters,
-    setPage,
-    setSort,
-    setFilter,
-  } = useTableState({
+  const { page, sort, filters, setPage, setSort, setFilter } = useTableState({
     sortFields: ["createdAt"],
     defaultSort: { field: "createdAt", order: "desc" },
     filterKeys: ["action", "entity", "actorEmail"],
@@ -94,8 +87,7 @@ export default function AuditLogsTable() {
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
-  const goToPage = (p: number) =>
-    setPage(Math.min(Math.max(p, 1), totalPages));
+  const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
   const columns: Column<AuditLog>[] = [
     {

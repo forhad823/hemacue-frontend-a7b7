@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { CtaSection } from "@/components/shared/cta-section";
-import { PageHero } from "@/components/shared/page-hero";
-import { SectionHeading } from "@/components/shared/section-heading";
 import FaqAccordion, {
   type FaqEntry,
 } from "@/components/modules/faq/FaqAccordion";
+import { CtaSection } from "@/components/shared/cta-section";
+import { PageHero } from "@/components/shared/page-hero";
+import { SectionHeading } from "@/components/shared/section-heading";
 import { CONTACT_INFO } from "@/lib/constants";
 
 export const metadata: Metadata = {

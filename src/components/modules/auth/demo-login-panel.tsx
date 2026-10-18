@@ -1,14 +1,14 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { HeartPulse, ShieldCheck, User } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLogin } from "@/hooks";
 import { userApi } from "@/api";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
+import { useLogin } from "@/hooks";
 import { queryKeys } from "@/lib/query-keys";
 import { setRoleCookie } from "@/lib/session-client";
-import { toast } from "@/components/ui/toast";
-import { Button } from "@/components/ui/button";
-import { ShieldCheck, User, HeartPulse } from "lucide-react";
 
 interface DemoAccount {
   label: string;

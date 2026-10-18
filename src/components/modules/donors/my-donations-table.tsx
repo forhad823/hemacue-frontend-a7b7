@@ -105,7 +105,9 @@ export default function MyDonationsTable() {
         onSuccess: () =>
           toast.add({
             title:
-              response === "ACCEPTED" ? "Donation accepted" : "Donation declined",
+              response === "ACCEPTED"
+                ? "Donation accepted"
+                : "Donation declined",
             description:
               response === "ACCEPTED"
                 ? `${donation.request.patientName} has been notified. Please report to ${donation.request.hospitalName}.`

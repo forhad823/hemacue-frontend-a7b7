@@ -1,27 +1,27 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff, KeyRound, Lock, Mail, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { Eye, EyeOff, Lock, Mail, RefreshCw, KeyRound } from "lucide-react";
-import { resetPasswordSchema } from "@/validation";
-import { useResetPassword, useForgotPassword, useCountdown } from "@/hooks";
-import { toast } from "@/components/ui/toast";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
+import { useCountdown, useForgotPassword, useResetPassword } from "@/hooks";
+import { resetPasswordSchema } from "@/validation";
 
 export default function ResetPasswordForm() {
   const router = useRouter();

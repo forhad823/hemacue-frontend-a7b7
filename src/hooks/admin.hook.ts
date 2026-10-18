@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/api";
 import { queryKeys } from "@/lib/query-keys";
 import type {
+  AdminPaymentsQueryParams,
   AdminUser,
   AdminUsersQueryParams,
   AuditLogsQueryParams,
@@ -47,6 +48,18 @@ export function useAdminUsers(params: AdminUsersQueryParams = {}) {
   return useQuery({
     queryKey: queryKeys.admin.users(params),
     queryFn: () => adminApi.users(params),
+    placeholderData: (previous) => previous,
+  });
+}
+
+/**
+ * Paginated platform-wide payment list (admin only).
+ * Read-only: refunds invalidate `["blood-requests"]`, never this key.
+ */
+export function useAdminPayments(params: AdminPaymentsQueryParams = {}) {
+  return useQuery({
+    queryKey: queryKeys.admin.payments(params),
+    queryFn: () => adminApi.payments(params),
     placeholderData: (previous) => previous,
   });
 }
