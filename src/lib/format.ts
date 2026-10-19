@@ -48,6 +48,24 @@ export function formatCurrency(amount: number, currency = "BDT"): string {
     .replace("BDT", "৳");
 }
 
+// Cached axis-label formatters for dashboard charts (chart-buckets.ts).
+// Kept here so every `Intl` construction in the app lives in one file.
+const MONTH_AXIS_LABEL = new Intl.DateTimeFormat("en-GB", { month: "short" });
+const WEEK_AXIS_LABEL = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+});
+
+/** "Oct" — short calendar-month axis label for monthly chart buckets. */
+export function formatMonthAxisLabel(date: Date): string {
+  return MONTH_AXIS_LABEL.format(date);
+}
+
+/** "12 Oct" — short day+month axis label for weekly chart buckets. */
+export function formatWeekAxisLabel(date: Date): string {
+  return WEEK_AXIS_LABEL.format(date);
+}
+
 /** Whole days between today and a future date; negative when the date has passed. */
 export function daysUntil(
   value: string | Date | null | undefined,

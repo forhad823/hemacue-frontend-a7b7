@@ -25,9 +25,11 @@ import {
 } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatBloodGroup } from "@/lib/format";
+import { useBloodRequests, useGetMe, useMyBloodRequests } from "@/hooks";
+import { DEFAULT_HERO, personalizeHero } from "@/lib/ai/hero-slice";
+import { formatBloodGroup, getCooldownState } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { BloodGroup } from "@/types";
+import { BloodGroup, UserRole } from "@/types";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -97,23 +99,25 @@ ${
 `;
 
 // ─── Slide data ──────────────────────────────────────────────────────────────
+// Slide 1's copy lives in `DEFAULT_HERO` (src/lib/ai/hero-slice.ts) so the
+// anonymous marketing text has ONE source; the component below overlays
+// role-aware personalized copy on top of it at render time.
 
 const SLIDES = [
   {
     id: "request",
-    eyebrow: "24/7 emergency blood network",
-    headline: "Every Drop Counts.",
-    headlineAccent: "Every Second Matters.",
-    subhead:
-      "Hemacue connects verified blood donors with patients in critical need across Bangladesh. Requests are matched by blood group and district, verified by an admin, and tracked until the blood reaches the hospital.",
+    eyebrow: DEFAULT_HERO.eyebrow,
+    headline: DEFAULT_HERO.headline,
+    headlineAccent: DEFAULT_HERO.headlineAccent,
+    subhead: DEFAULT_HERO.subhead,
     primaryCta: {
-      label: "Request Blood",
-      href: "/register?role=PATIENT",
+      label: DEFAULT_HERO.primaryCta.label,
+      href: DEFAULT_HERO.primaryCta.href,
       icon: Droplet,
     },
     secondaryCta: {
-      label: "Become a Donor",
-      href: "/register?role=DONOR",
+      label: DEFAULT_HERO.secondaryCta.label,
+      href: DEFAULT_HERO.secondaryCta.href,
       icon: HeartPulse,
     },
     accentFrom: "from-red-600",
@@ -250,6 +254,65 @@ function useAutoAdvance(length: number) {
 // ─── Hero component ──────────────────────────────────────────────────────────
 
 export default function Hero() {
+  // ── Personalization state (deterministic, role-aware) ────────────────────
+  const { data: me } = useGetMe();
+  const user = me?.data ?? null;
+
+  // Donors: count of verified requests matching their blood group (limit 1
+  // rows, read meta.total — never fetches the rows themselves).
+  const { data: matchData } = useBloodRequests(
+    {
+      bloodGroups: user?.bloodGroup ? [user.bloodGroup] : [],
+      status: "VERIFIED",
+      limit: 1,
+    },
+    { enabled: user?.role === UserRole.DONOR && user.isAvailable },
+  );
+
+  // Patients: same { limit: 100 } key as PatientRequestsOverview → shared
+  // React Query cache once the dashboard has been visited.
+  const { data: myData } = useMyBloodRequests(
+    { limit: 100 },
+    { enabled: user?.role === UserRole.PATIENT },
+  );
+
+  const cooldown = user
+    ? getCooldownState(user.lastDonatedAt ?? null, user.isAvailable)
+    : null;
+  const availableRequestCount = matchData?.meta?.total ?? 0;
+  const activeRequestCount = (myData?.data ?? []).filter(
+    (request) =>
+      request.status !== "COMPLETED" && request.status !== "CANCELLED",
+  ).length;
+
+  // Slide 1 = personalized overlay on DEFAULT_HERO; slides 2–3 unchanged.
+  const personalized = personalizeHero(
+    user,
+    cooldown,
+    availableRequestCount,
+    activeRequestCount,
+  );
+  const slides = [
+    {
+      ...SLIDES[0],
+      eyebrow: personalized.eyebrow,
+      headline: personalized.headline,
+      headlineAccent: personalized.headlineAccent,
+      subhead: personalized.subhead,
+      primaryCta: {
+        ...SLIDES[0].primaryCta,
+        label: personalized.primaryCta.label,
+        href: personalized.primaryCta.href,
+      },
+      secondaryCta: {
+        ...SLIDES[0].secondaryCta,
+        label: personalized.secondaryCta.label,
+        href: personalized.secondaryCta.href,
+      },
+    },
+    ...SLIDES.slice(1),
+  ];
+
   const {
     index,
     cycle,
@@ -262,7 +325,7 @@ export default function Hero() {
     prefersReducedMotion,
     onControlsMouseEnter,
     onControlsMouseLeave,
-  } = useAutoAdvance(SLIDES.length);
+  } = useAutoAdvance(slides.length);
 
   const [spotlightIndex, setSpotlightIndex] = useState(0);
   const [hoveredGroup, setHoveredGroup] = useState<number | null>(null);
@@ -280,7 +343,7 @@ export default function Hero() {
     return () => clearInterval(t);
   }, [prefersReducedMotion]);
 
-  const slide = SLIDES[index];
+  const slide = slides[index];
   const PrimaryIcon = slide.primaryCta.icon;
   const SecondaryIcon = slide.secondaryCta.icon;
   const IllustrationIcon = slide.illustrationIcon;
@@ -294,7 +357,7 @@ export default function Hero() {
   const slideA11yProps = {
     role: "group" as const,
     "aria-roledescription": "slide",
-    "aria-label": `Slide ${index + 1} of ${SLIDES.length}: ${slide.eyebrow}`,
+    "aria-label": `Slide ${index + 1} of ${slides.length}: ${slide.eyebrow}`,
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
@@ -613,7 +676,7 @@ export default function Hero() {
               aria-label="Carousel slide indicators"
               className="flex gap-2"
             >
-              {SLIDES.map((s, i) => (
+              {slides.map((s, i) => (
                 <button
                   key={s.id}
                   type="button"
@@ -641,7 +704,7 @@ export default function Hero() {
                 {autoPlayActive ? "Auto-rotating" : "Paused"}
               </p>
               <p className="text-xs tabular-nums text-muted-foreground">
-                {index + 1} / {SLIDES.length}
+                {index + 1} / {slides.length}
               </p>
             </div>
           </div>

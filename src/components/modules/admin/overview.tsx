@@ -4,12 +4,14 @@ import { Banknote, Droplets, HeartHandshake, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ChartSkeleton, StatsSkeleton } from "@/components/dashboard/skeletons";
+import { AiInsightList } from "@/components/shared/ai-insight-list";
 import { PageHeading } from "@/components/shared/page-heading";
 import { StatCard } from "@/components/shared/stat-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStats } from "@/hooks";
+import { generateAdminInsights } from "@/lib/ai/insights";
 import { buildStatusBars, buildUserSlices } from "@/lib/dashboard-chart-data";
 
 /** Recharts is ~100 kB gzipped — keep it out of the initial dashboard bundle. */
@@ -112,6 +114,8 @@ export default function AdminOverview() {
           trend={`${stats.payments.totalCompletedPayments} completed payments`}
         />
       </div>
+
+      <AiInsightList insights={generateAdminInsights(stats)} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <UsersChart data={userSlices} />

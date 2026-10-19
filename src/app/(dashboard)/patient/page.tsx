@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ChartSkeleton } from "@/components/dashboard/skeletons";
 import MyRequestsTable from "@/components/modules/blood-requests/my-requests-table";
+import PatientInsights from "@/components/modules/blood-requests/patient-insights";
 import PatientRequestsOverview from "@/components/modules/blood-requests/patient-requests-overview";
 import { PageHeading } from "@/components/shared/page-heading";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export default function PatientRequestsPage() {
         >
           <PatientRequestsOverview />
         </Suspense>
+        <PatientInsights />
         <MyRequestsTable />
       </div>
     </div>

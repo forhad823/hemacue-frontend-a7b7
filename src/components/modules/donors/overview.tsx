@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { StatsSkeleton } from "@/components/dashboard/skeletons";
 import MyDonationsTable from "@/components/modules/donors/my-donations-table";
+import { AiInsightList } from "@/components/shared/ai-insight-list";
 import { PageHeading } from "@/components/shared/page-heading";
 import { StatCard } from "@/components/shared/stat-card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMe, useMyDonations } from "@/hooks";
+import { generateDonorInsights } from "@/lib/ai/insights";
 import { DONATION_COOLDOWN_DAYS } from "@/lib/constants";
 import { getCooldownState } from "@/lib/format";
 
@@ -112,6 +114,8 @@ export default function DonorOverview() {
           </CardContent>
         </Card>
       )}
+
+      <AiInsightList insights={generateDonorInsights(donations, cooldown)} />
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">

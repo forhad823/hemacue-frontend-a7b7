@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Ban,
-  MoreHorizontal,
-  ShieldCheck,
-  UserCog,
-} from "lucide-react";
+import { Ban, MoreHorizontal, ShieldCheck, UserCog } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -18,7 +11,7 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +38,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
 import { useAdminUsers, useGetMe, useUpdateUserRole } from "@/hooks";
 import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import type { TableSort } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import {
   BLOOD_GROUP_OPTIONS,
   DISTRICTS,
@@ -117,35 +112,26 @@ export default function AdminUsersTable({
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
+  // AI suggestions rank only what is on screen — names, emails, districts.
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ users }),
+    [users],
+  );
+
   const goToPage = (page: number) =>
     setValues({ page: String(Math.min(Math.max(page, 1), totalPages)) });
 
-  const handleSort = (field: SortableField) => {
+  const sort: TableSort = {
+    field: values.sortBy,
+    order: values.sortOrder === "asc" ? "asc" : "desc",
+  };
+
+  const handleSort = (field: string) => {
     if (values.sortBy === field) {
       setValues({ sortOrder: values.sortOrder === "asc" ? "desc" : "asc" });
       return;
     }
     setValues({ sortBy: field, sortOrder: "asc", page: "1" });
-  };
-
-  const sortButton = (field: SortableField, label: string) => {
-    const isActive = values.sortBy === field;
-    const Icon = !isActive
-      ? ArrowUpDown
-      : values.sortOrder === "asc"
-        ? ArrowUp
-        : ArrowDown;
-
-    return (
-      <button
-        type="button"
-        onClick={() => handleSort(field)}
-        className="inline-flex cursor-pointer items-center gap-1 hover:text-foreground"
-      >
-        {label}
-        <Icon className="size-3" />
-      </button>
-    );
   };
 
   const changeRole = (user: AdminUser, role: UserRole) => {
@@ -198,7 +184,14 @@ export default function AdminUsersTable({
   const columns: Column<AdminUser>[] = [
     {
       id: "user",
-      header: sortButton("name", "User"),
+      header: (
+        <SortableHeader
+          label="User"
+          field="name"
+          sort={sort}
+          onSort={handleSort}
+        />
+      ),
       cell: (user) => (
         <div className="flex items-center gap-3">
           <Avatar className="size-8 shrink-0">
@@ -225,7 +218,14 @@ export default function AdminUsersTable({
     },
     {
       id: "role",
-      header: sortButton("role", "Role"),
+      header: (
+        <SortableHeader
+          label="Role"
+          field="role"
+          sort={sort}
+          onSort={handleSort}
+        />
+      ),
       cell: (user) => (
         <Badge variant={ROLE_BADGE_VARIANT[user.role]} className="uppercase">
           {humanizeToken(user.role)}
@@ -266,7 +266,14 @@ export default function AdminUsersTable({
     },
     {
       id: "joined",
-      header: sortButton("createdAt", "Joined"),
+      header: (
+        <SortableHeader
+          label="Joined"
+          field="createdAt"
+          sort={sort}
+          onSort={handleSort}
+        />
+      ),
       cell: (user) => (
         <span className="whitespace-nowrap text-sm text-muted-foreground">
           {formatDate(user.createdAt)}
@@ -333,9 +340,10 @@ export default function AdminUsersTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={values.searchTerm}
           onChange={(searchTerm) => setValues({ searchTerm, page: "1" })}
+          index={suggestionIndex}
           placeholder="Search name or email..."
           className="lg:max-w-xs"
         />

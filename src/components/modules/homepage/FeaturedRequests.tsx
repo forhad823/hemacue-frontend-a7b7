@@ -2,8 +2,8 @@ import { ArrowRight, Calendar, Droplet, MapPin } from "lucide-react";
 import Link from "next/link";
 import { publicApi } from "@/api/public.api";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
-import { EmptyState } from "@/components/shared/empty-state";
 import { ListingCard } from "@/components/shared/listing-card";
+import { ListingGrid } from "@/components/shared/listing-grid";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
@@ -39,16 +39,12 @@ export default async function FeaturedRequests() {
         </Button>
       </div>
 
-      {requests.length === 0 ? (
-        <div className="mt-10">
-          <EmptyState
-            icon={Droplet}
-            title="No active requests right now"
-            description="All urgent requests have been fulfilled. Check back soon or register as a donor to be notified when a new request arrives."
-          />
-        </div>
-      ) : (
-        <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10">
+        <ListingGrid
+          count={requests.length}
+          emptyTitle="No active requests right now"
+          emptyDescription="All urgent requests have been fulfilled. Check back soon or register as a donor to be notified when a new request arrives."
+        >
           {requests.map((req) => (
             <li key={req.id}>
               <ListingCard
@@ -95,8 +91,8 @@ export default async function FeaturedRequests() {
               />
             </li>
           ))}
-        </ul>
-      )}
+        </ListingGrid>
+      </div>
     </section>
   );
 }

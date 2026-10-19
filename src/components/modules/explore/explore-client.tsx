@@ -1,5 +1,6 @@
 "use client";
 
+import type { UseQueryResult } from "@tanstack/react-query";
 import { Droplets, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -26,6 +27,7 @@ import type {
   ApiResponse,
   BloodGroup,
   BloodRequest,
+  BloodRequestQueryParams,
   RequestStatus,
   UrgencyLevel,
 } from "@/types";
@@ -57,7 +59,9 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
 
   const debouncedSearch = useDebounce(searchTerm, 400);
 
-  const params = useMemo(
+  // Explicit annotation keeps the query's generic inference free of any
+  // dependency on this object (prevents circular-inference ts(7022)).
+  const params: BloodRequestQueryParams = useMemo(
     () => ({
       page,
       limit: PAGE_SIZE,
@@ -85,7 +89,11 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
     ],
   );
 
-  const { data, isPending, isFetching } = useBloodRequests(params);
+  const {
+    data,
+    isPending,
+    isFetching,
+  }: UseQueryResult<ApiResponse<BloodRequest[]>> = useBloodRequests(params);
   const requests = data?.data ?? initialData?.data ?? [];
   const meta = data?.meta ?? initialData?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
@@ -203,14 +211,14 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
         </div>
 
         {isPending ? (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ListingGrid count={PAGE_SIZE}>
             {Array.from({ length: PAGE_SIZE }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholder
               <li key={i}>
                 <Skeleton className="h-64 w-full rounded-xl" />
               </li>
             ))}
-          </ul>
+          </ListingGrid>
         ) : (
           <ListingGrid
             count={requests.length}

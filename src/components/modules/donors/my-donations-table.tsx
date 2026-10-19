@@ -3,6 +3,7 @@
 import { CheckCircle2, HeartHandshake, MapPin, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -11,7 +12,6 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import {
   AssignmentStatusBadge,
@@ -24,6 +24,7 @@ import { toast } from "@/components/ui/toast";
 import { useMyDonations, useRespondToRequest } from "@/hooks";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import { BLOOD_GROUP_OPTIONS, URGENCY_OPTIONS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import type {
@@ -93,6 +94,12 @@ export default function MyDonationsTable() {
   const donations = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
+
+  // AI suggestions: patient names and hospitals from the visible assignments.
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ donations }),
+    [donations],
+  );
 
   const handleRespond = (
     donation: MyDonation,
@@ -262,9 +269,10 @@ export default function MyDonationsTable() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={searchTerm}
           onChange={setSearch}
+          index={suggestionIndex}
           placeholder="Search patient or hospital..."
           className="sm:max-w-xs"
         />

@@ -3,18 +3,14 @@
  * or Monday-start weeks, plus a fold that assigns arbitrary rows to them.
  * Pure functions — no React, no Recharts, unit-testable.
  */
+import { formatMonthAxisLabel, formatWeekAxisLabel } from "@/lib/format";
+
 export interface ChartBucket {
   /** Stable key, matched against `bucketKeyOfMonth` / `bucketKeyOfWeek`. */
   key: string;
   /** Short axis label, e.g. "Oct" or "12 Oct". */
   label: string;
 }
-
-const MONTH_LABEL = new Intl.DateTimeFormat("en-GB", { month: "short" });
-const WEEK_LABEL = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-});
 
 const two = (value: number) => String(value).padStart(2, "0");
 
@@ -44,7 +40,7 @@ export function monthBuckets(count: number, now = new Date()): ChartBucket[] {
   for (let taken = 0; taken < count; taken += 1) {
     buckets.unshift({
       key: bucketKeyOfMonth(cursor),
-      label: MONTH_LABEL.format(cursor),
+      label: formatMonthAxisLabel(cursor),
     });
     cursor.setMonth(cursor.getMonth() - 1);
   }
@@ -60,7 +56,7 @@ export function weekBuckets(count: number, now = new Date()): ChartBucket[] {
     start.setDate(start.getDate() - offset * 7);
     buckets.push({
       key: bucketKeyOfWeek(start),
-      label: WEEK_LABEL.format(start),
+      label: formatWeekAxisLabel(start),
     });
   }
   return buckets;

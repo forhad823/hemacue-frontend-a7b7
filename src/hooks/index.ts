@@ -3,6 +3,7 @@ export * from "./auth.hook";
 export * from "./bloodRequest.hook";
 export * from "./donorMatch.hook";
 export * from "./payment.hook";
+export * from "./use-ai-suggestions";
 export * from "./use-copy-to-clipboard";
 export * from "./use-countdown";
 export * from "./use-debounce";

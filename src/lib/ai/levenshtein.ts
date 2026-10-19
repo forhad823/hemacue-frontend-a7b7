@@ -1,0 +1,29 @@
+/**
+ * Classic Levenshtein edit distance between two strings (two-row DP).
+ *
+ * Deterministic implementation — no LLM, no network. Swap for an embedding
+ * search by replacing the scoring layer in `suggestions.ts`; callers stay
+ * unchanged.
+ */
+export function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i];
+    for (let j = 1; j <= b.length; j++) {
+      const substitutionCost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + substitutionCost,
+      );
+    }
+    previous = current;
+  }
+
+  return previous[b.length];
+}

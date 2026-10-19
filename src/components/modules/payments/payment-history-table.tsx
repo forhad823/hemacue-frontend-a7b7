@@ -2,6 +2,7 @@
 
 import { CreditCard, Receipt } from "lucide-react";
 import { useMemo } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -10,7 +11,6 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import { StatCard } from "@/components/shared/stat-card";
 import {
@@ -22,6 +22,7 @@ import { useMyPayments } from "@/hooks";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import { PAYMENT_STATUS_OPTIONS, PAYMENT_TYPE_OPTIONS } from "@/lib/constants";
 import { formatCurrency, formatDateTime, humanizeToken } from "@/lib/format";
 import type { PaymentStatus, PaymentType, PaymentWithRequest } from "@/types";
@@ -74,6 +75,12 @@ export default function PaymentHistoryTable() {
   const payments = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
+
+  // AI suggestions: trx/payment IDs and patient names from visible rows.
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ payments }),
+    [payments],
+  );
 
   const completed = payments.filter((p) => p.status === "COMPLETED");
   const lifetimeSpend = completed.reduce(
@@ -218,9 +225,10 @@ export default function PaymentHistoryTable() {
 
       {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={searchTerm}
           onChange={setSearch}
+          index={suggestionIndex}
           placeholder="Search by patient or Trx ID..."
           className="sm:max-w-xs"
         />

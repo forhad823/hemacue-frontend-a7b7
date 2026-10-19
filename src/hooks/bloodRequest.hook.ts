@@ -33,10 +33,14 @@ export function useBloodRequests(
   });
 }
 
-export function useMyBloodRequests(params: BloodRequestQueryParams = {}) {
+export function useMyBloodRequests(
+  params: BloodRequestQueryParams = {},
+  options: BloodRequestListOptions = {},
+) {
   return useQuery({
     queryKey: queryKeys.bloodRequests.my(params),
     queryFn: () => bloodRequestApi.myRequests(params),
+    enabled: options.enabled ?? true,
   });
 }
 
