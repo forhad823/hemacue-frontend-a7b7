@@ -4,11 +4,11 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { Droplets, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { ListingCard } from "@/components/shared/listing-card";
 import { ListingGrid } from "@/components/shared/listing-grid";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useBloodRequests } from "@/hooks";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import {
   BLOOD_GROUP_OPTIONS,
   DISTRICTS,
@@ -98,6 +99,11 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
   const meta = data?.meta ?? initialData?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
 
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ requests }),
+    [requests],
+  );
+
   return (
     <div className="grid gap-8 lg:grid-cols-12">
       {/* ── Left: filter sidebar ── */}
@@ -120,9 +126,10 @@ export function ExploreClient({ initialData }: ExploreClientProps) {
             )}
           </div>
 
-          <SearchInput
+          <AiSearchInput
             value={searchTerm}
             onChange={setSearch}
+            index={suggestionIndex}
             placeholder="Search patient or hospital..."
           />
 

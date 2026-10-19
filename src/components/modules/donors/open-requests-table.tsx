@@ -3,6 +3,7 @@
 import { Droplets, Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -11,12 +12,12 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
 import { Button } from "@/components/ui/button";
 import { useBloodRequests, useGetMe } from "@/hooks";
 import { useSearchParamsState } from "@/hooks/use-search-params-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import { compatiblePatientGroups } from "@/lib/blood-compatibility";
 import {
   BLOOD_GROUP_OPTIONS,
@@ -133,6 +134,11 @@ export default function OpenRequestsTable() {
   const totalPages = Math.max(
     1,
     data?.meta?.totalPages ?? data?.meta?.totalPage ?? 1,
+  );
+
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ requests }),
+    [requests],
   );
 
   // Filters can shrink the result set underneath the current page.
@@ -253,9 +259,10 @@ export default function OpenRequestsTable() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={values.searchTerm}
           onChange={(searchTerm) => setValues({ searchTerm, page: "1" })}
+          index={suggestionIndex}
           placeholder="Search hospital, patient or city..."
           className="lg:max-w-xs"
         />

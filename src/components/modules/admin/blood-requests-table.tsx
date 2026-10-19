@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -11,7 +12,6 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
@@ -30,6 +30,7 @@ import { toast } from "@/components/ui/toast";
 import { useBloodRequests, useUpdateRequestStatus } from "@/hooks";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import {
   BLOOD_GROUP_OPTIONS,
   DISTRICTS,
@@ -115,6 +116,11 @@ export default function AdminBloodRequestsTable() {
   const requests = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
+
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ requests }),
+    [requests],
+  );
 
   const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
@@ -280,9 +286,10 @@ export default function AdminBloodRequestsTable() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={searchTerm}
           onChange={(v) => setSearch(v)}
+          index={suggestionIndex}
           placeholder="Search patient, hospital or city..."
           className="lg:max-w-xs"
         />

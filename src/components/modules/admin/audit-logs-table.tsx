@@ -2,6 +2,7 @@
 
 import { ScrollText, ShieldCheck } from "lucide-react";
 import { useMemo } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import {
   type Column,
   DataTableShell,
@@ -9,12 +10,12 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuditLogs } from "@/hooks";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import { AUDIT_ACTION_OPTIONS } from "@/lib/constants";
 import { formatDateTime, humanizeToken } from "@/lib/format";
 import type { AuditLog } from "@/types";
@@ -86,6 +87,17 @@ export default function AuditLogsTable() {
   const logs = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
+
+  const suggestionIndex = useMemo(
+    () =>
+      buildSuggestionIndex({
+        users: logs.map((log) => ({
+          name: log.user?.name,
+          email: log.user?.email,
+        })),
+      }),
+    [logs],
+  );
 
   const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
@@ -175,9 +187,10 @@ export default function AuditLogsTable() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={filters.actorEmail}
           onChange={(actorEmail) => setFilter("actorEmail", actorEmail)}
+          index={suggestionIndex}
           placeholder="Search actor email..."
           className="lg:max-w-xs"
         />

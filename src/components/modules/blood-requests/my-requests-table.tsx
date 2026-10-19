@@ -3,6 +3,7 @@
 import { Droplets, FilePlus2, Inbox } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { AiSearchInput } from "@/components/shared/ai-search-input";
 import { BloodGroupBadge } from "@/components/shared/blood-group-badge";
 import {
   type Column,
@@ -11,7 +12,6 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterSelect } from "@/components/shared/filter-select";
 import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SearchInput } from "@/components/shared/search-input";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import { RequestStatusBadge } from "@/components/shared/status-badge";
 import { UrgencyBadge } from "@/components/shared/urgency-badge";
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useMyBloodRequests } from "@/hooks";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTableState } from "@/hooks/use-table-state";
+import { buildSuggestionIndex } from "@/lib/ai/suggestion-index";
 import { REQUEST_STATUS_OPTIONS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import type { BloodRequest, RequestStatus } from "@/types";
@@ -60,6 +61,11 @@ export default function MyRequestsTable() {
   const requests = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? meta?.totalPage ?? 1;
+
+  const suggestionIndex = useMemo(
+    () => buildSuggestionIndex({ requests }),
+    [requests],
+  );
 
   const goToPage = (p: number) => setPage(Math.min(Math.max(p, 1), totalPages));
 
@@ -167,9 +173,10 @@ export default function MyRequestsTable() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <SearchInput
+        <AiSearchInput
           value={searchTerm}
           onChange={(v) => setSearch(v)}
+          index={suggestionIndex}
           placeholder="Search patient or hospital..."
           className="sm:max-w-xs"
         />
