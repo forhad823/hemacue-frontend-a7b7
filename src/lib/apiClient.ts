@@ -1,12 +1,12 @@
 import { ofetch } from "ofetch";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+//Change the BASE_URL to use the local proxy path. This ensures the browser only talks to hemacue-frontend.vercel.app, making the cookies first-party
+const BASE_URL = "/api/v1";
 
 const apiClient = ofetch.create({
   baseURL: BASE_URL,
   credentials: "include",
   onResponseError({ response }) {
-    // Optional: normalize thrown errors. ofetch throws FetchError with .data = response body.
     throw response._data ?? response;
   },
 });

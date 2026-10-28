@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   reactCompiler: true,
+  // rewrites rule for production
+  async rewrites() {
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: "https://hemacue-backend.vercel.app/api/v1/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

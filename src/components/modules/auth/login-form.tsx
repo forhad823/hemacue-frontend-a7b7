@@ -48,7 +48,7 @@ export default function LoginForm() {
         {
           onSuccess: async () => {
             try {
-              const meRes = await queryClient.fetchQuery({
+              const meRes = await queryClient.query({
                 queryKey: queryKeys.users.me,
                 queryFn: () => userApi.getMe(),
               });

@@ -9,7 +9,7 @@ export const userApi = {
     apiClient<ApiResponse<UserProfile>>("/users/me", {
       method: "PATCH",
       body: p,
-    }),
+    }), 
 
   uploadAvatar: (file: File) => {
     const fd = new FormData();

@@ -79,7 +79,7 @@
 ### 🔐 Authentication & Role-Based Security (RBAC)
 
 1. **HTTP-Only Cookies & Bearer Headers:** Authentication tokens (`accessToken`, `refreshToken`) are stored in secure HTTP-Only cookies to protect against XSS vectors, while also sent via `Authorization: Bearer <token>` headers for REST calls.
-2. **Next.js Route Middleware (`middleware.ts`):** Intercepts incoming navigation requests to `/patient/*`, `/donor/*`, and `/admin/*`, ensuring users match required roles.
+2. **Next.js Route Middleware (`proxy.ts`):** Intercepts incoming navigation requests to `/patient/*`, `/donor/*`, and `/admin/*`, ensuring users match required roles.
 3. **Automatic Token Rotation:** The Axios interceptor (`src/lib/apiClient.ts`) listens for 401 response codes and transparently fetches a new access token via `/auth/refresh-token` before retrying failed queries.
 
 ### 💳 bKash Payment & Invoice Workflow
